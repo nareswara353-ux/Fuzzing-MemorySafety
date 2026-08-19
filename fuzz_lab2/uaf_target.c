@@ -30,7 +30,7 @@ void process_commands(const uint8_t *data, size_t size) {
             case 0x02: // DELETE SESSION (VULNERABILITY: Dangling pointer)
                 if (g_session) {
                     free(g_session);
-                    // Bug: g_session tidak di-set ke NULL
+                    g_session = NULL;
                 }
                 break;
 
