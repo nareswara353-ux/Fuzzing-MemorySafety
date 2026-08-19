@@ -1,0 +1,18 @@
+cat << 'EOF' > .gitignore
+# Binaries & Build Artifacts
+vuln_fuzz
+*.o
+*.so
+*.a
+
+# AFL++ Output & Temporary Data
+out/
+core
+core.*
+.cur_input
+
+# OS / Editor Artifacts
+.DS_Store
+*.swp
+*~
+EOF
