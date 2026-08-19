@@ -1,4 +1,3 @@
-cat << 'EOF' > vuln_parser.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,8 +5,8 @@ cat << 'EOF' > vuln_parser.c
 
 #pragma pack(push, 1)
 typedef struct {
-    char magic[4];       
-    uint8_t version;     
+    char magic[4];       // "PACK"
+    uint8_t version;     // 0x02
     uint16_t chunk_count;
     uint16_t payload_len;
 } Header;
@@ -78,4 +77,3 @@ int main(int argc, char **argv) {
     free(buf);
     return 0;
 }
-EOF
