@@ -1,6 +1,7 @@
 import socket
 import os
-import json
+import struct
+import random
 import time
 import threading
 
@@ -13,13 +14,45 @@ server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 server.bind(SOCKET_PATH)
 server.listen(5)
 
-print(f"[*] LLM Daemon listening on {SOCKET_PATH}...")
+seed_pool = []
+pool_lock = threading.Lock()
 
-# Pool seed hasil generasi LLM yang siap diambil AFL++
-seed_pool = [
-    b"PACK\x02\x01\x00\x40\x00" + b"A" * 64,
-    b"PACK\x02\x02\x00\x80\x00" + b"\x7FE" + b"B" * 126
-]
+def llm_synthesis_worker():
+    """
+    Background Worker: Mensimulasikan/memanggil generator LLM 
+    untuk memproduksi batch variasi biner terstruktur secara kontinu.
+    """
+    print("[+] Background LLM Generator Worker started.")
+    while True:
+        # Jaga agar antrean buffer selalu memiliki 10-50 seed terstruktur
+        if len(seed_pool) < 20:
+            batch = []
+            for _ in range(10):
+                magic = b"PACK"
+                version = 0x02
+                
+                # Strategi 1: Mutasi Trigger Crash (payload_len > chunk_count * 16)
+                if random.random() < 0.4:
+                    chunks = random.randint(1, 2)
+                    # Alokasi kecil (16/32 bytes), payload besar (64 - 256 bytes)
+                    p_len = (chunks * 16) + random.randint(16, 200)
+                    body = b"\x7FE" + b"A" * (p_len - 2)
+                # Strategi 2: Eksplorasi Coverage Baru (State Transition)
+                else:
+                    chunks = random.randint(1, 8)
+                    p_len = chunks * 16
+                    body = os.urandom(p_len)
+
+                header = struct.pack("<4sBHH", magic, version, chunks, p_len)
+                batch.append(header + body)
+
+            with pool_lock:
+                seed_pool.extend(batch)
+
+        time.sleep(0.05) # Throttle loop background generator
+
+# Jalankan worker di thread terpisah
+threading.Thread(target=llm_synthesis_worker, daemon=True).start()
 
 def handle_client(conn):
     while True:
@@ -28,16 +61,20 @@ def handle_client(conn):
             if not req:
                 break
             
-            # Berikan seed mutasi dari antrean secara instan (non-blocking untuk AFL++)
-            if seed_pool:
-                reply = seed_pool.pop(0)
-                conn.sendall(reply)
+            payload = None
+            with pool_lock:
+                if seed_pool:
+                    payload = seed_pool.pop(0)
+
+            if payload:
+                conn.sendall(payload)
             else:
                 conn.sendall(b"EMPTY")
         except Exception:
             break
     conn.close()
 
+print(f"[*] LLM Daemon listening on {SOCKET_PATH}...")
 while True:
     conn, _ = server.accept()
     threading.Thread(target=handle_client, args=(conn,), daemon=True).start()
