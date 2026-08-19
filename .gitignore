@@ -1,18 +1,13 @@
-cat << 'EOF' > .gitignore
-# Binaries & Build Artifacts
-vuln_fuzz
+# Abaikan folder output fuzzer di semua subdirektori
+**/out/
+**/out_verify/
+**/out_crashes/
+
+# Abaikan binary dan build artifacts
+**/vuln_fuzz
+**/vuln_fuzz_buggy
+**/uaf_fuzz
+*.bin.*
 *.o
 *.so
-*.a
-
-# AFL++ Output & Temporary Data
-out/
-core
 core.*
-.cur_input
-
-# OS / Editor Artifacts
-.DS_Store
-*.swp
-*~
-EOF
