@@ -38,6 +38,12 @@ void parse_payload(const uint8_t *data, size_t size) {
     char *dynamic_buf = (char *)malloc(alloc_sz);
     if (!dynamic_buf) return;
 
+    // PERBAIKAN: Validasi invarian relasional sebelum memory copy
+    if (hdr->payload_len > alloc_sz) {
+    free(dynamic_buf);
+    return; // Tolak payload yang melebihi kapasitas buffer yang dialokasikan
+}
+
     // VULNERABILITY: Heap Buffer Overflow jika payload_len > alloc_sz
     memcpy(dynamic_buf, body, hdr->payload_len);
 
