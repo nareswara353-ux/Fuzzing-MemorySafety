@@ -39,7 +39,6 @@ void process_commands(const uint8_t *data, size_t size) {
                     char *raw = (char *)malloc(16);
                     if (raw) {
                         memcpy(raw, data + offset, 16);
-                        // Sengaja tidak di-free untuk mengklaim blok heap sebelumnya
                     }
                     offset += 16;
                 }
