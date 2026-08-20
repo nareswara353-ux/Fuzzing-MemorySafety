@@ -46,7 +46,6 @@ void process_commands(const uint8_t *data, size_t size) {
 
             case 0x04: 
                 if (g_session) {
-                    // Jika opcode 0x02 dieksekusi sebelumnya, terjadi Use-After-Free
                     if (g_session->privilege_level == 99) {
                         printf("[!] High privilege action executed\n");
                     } else {
