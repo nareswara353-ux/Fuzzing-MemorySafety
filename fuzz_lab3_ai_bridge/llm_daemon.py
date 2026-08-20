@@ -34,7 +34,6 @@ def llm_synthesis_worker():
                     chunks = random.randint(1, 2)
                     p_len = (chunks * 16) + random.randint(16, 200)
                     body = b"\x7FE" + b"A" * (p_len - 2)
-                # Strategi 2: Eksplorasi Coverage Baru (State Transition)
                 else:
                     chunks = random.randint(1, 8)
                     p_len = chunks * 16
@@ -46,9 +45,8 @@ def llm_synthesis_worker():
             with pool_lock:
                 seed_pool.extend(batch)
 
-        time.sleep(0.05) # Throttle loop background generator
-
-# Jalankan worker di thread terpisah
+        time.sleep(0.05) 
+        
 threading.Thread(target=llm_synthesis_worker, daemon=True).start()
 
 def handle_client(conn):
