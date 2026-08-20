@@ -55,7 +55,7 @@ void process_commands(const uint8_t *data, size_t size) {
                 break;
 
             default:
-                return; // Unknown opcode, terminasi parser
+                return; 
         }
     }
 }
