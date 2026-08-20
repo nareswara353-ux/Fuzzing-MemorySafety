@@ -1,5 +1,7 @@
 import os
 import csv
+import matplotlib
+matplotlib.use('Agg')  # Headless backend (mencegah crash GUI/GDK)
 import matplotlib.pyplot as plt
 
 def parse_afl_plot_data(filepath):
@@ -41,6 +43,7 @@ vanilla_data = parse_afl_plot_data("out_vanilla/default/plot_data")
 
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
+# Plot 1: Cumulative Path Discovery
 if ai_data and ai_data['time']:
     ax1.plot(ai_data['time'], ai_data['paths'], label='AI-Augmented Mutator (Qwen2.5-Coder)', color='#d62728', linewidth=2)
 if vanilla_data and vanilla_data['time']:
@@ -51,6 +54,7 @@ ax1.set_title('Empirical Comparison: Path Exploration & Throughput Over Time', f
 ax1.legend(loc='lower right')
 ax1.grid(True, linestyle=':', alpha=0.6)
 
+# Plot 2: Throughput
 if ai_data and ai_data['time']:
     ax2.plot(ai_data['time'], ai_data['speed'], label='AI IPC Bridge Speed', color='#d62728', alpha=0.8)
 if vanilla_data and vanilla_data['time']:
@@ -63,4 +67,4 @@ ax2.grid(True, linestyle=':', alpha=0.6)
 
 plt.tight_layout()
 plt.savefig('benchmark_result.png', dpi=300)
-print("[+] Enhanced benchmark plot successfully generated: benchmark_result.png")
+print("[+] Clean benchmark plot saved to benchmark_result.png")
