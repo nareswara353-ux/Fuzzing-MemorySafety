@@ -19,7 +19,6 @@ void parse_payload(const uint8_t *data, size_t size) {
 
     if (memcmp(hdr->magic, "PACK", 4) != 0) return;
 
-    // Gate 2: Version constraint
     if (hdr->version != 0x02) return;
 
     // Gate 3: State constraint
