@@ -19,9 +19,7 @@ def fuzz_count(buf):
 
 def fuzz(buf, add_buf, max_size):
     global client_sock
-    
-    # Prioritas 1: Ambil seed baru dari LLM Daemon via Socket
-    if client_sock:
+        if client_sock:
         try:
             client_sock.sendall(b"GET_MUTATION")
             data = client_sock.recv(4096)
