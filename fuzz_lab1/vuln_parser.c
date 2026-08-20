@@ -28,7 +28,6 @@ void parse_payload(const uint8_t *data, size_t size) {
 
     if (body_len < hdr->payload_len) return;
 
-    // Alokasi buffer berdasarkan chunk_count * 16 bytes
     size_t alloc_sz = (size_t)hdr->chunk_count * 16;
     if (alloc_sz == 0) alloc_sz = 16;
 
