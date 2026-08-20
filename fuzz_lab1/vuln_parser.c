@@ -5,7 +5,7 @@
 
 #pragma pack(push, 1)
 typedef struct {
-    char magic[4];       // "PACK"
+    char magic[4];       
     uint8_t version;     // 0x02
     uint16_t chunk_count;
     uint16_t payload_len;
