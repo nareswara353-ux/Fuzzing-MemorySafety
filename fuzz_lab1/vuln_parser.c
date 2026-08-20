@@ -17,7 +17,6 @@ void parse_payload(const uint8_t *data, size_t size) {
 
     const Header *hdr = (const Header *)data;
 
-    // Gate 1: Magic check
     if (memcmp(hdr->magic, "PACK", 4) != 0) return;
 
     // Gate 2: Version constraint
