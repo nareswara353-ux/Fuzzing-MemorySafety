@@ -34,7 +34,7 @@ void process_commands(const uint8_t *data, size_t size) {
                 }
                 break;
 
-            case 0x03: // ALLOCATE ARBITRARY DATA (Heap spraying / reclamation)
+            case 0x03: 
                 if (offset + 16 <= size) {
                     char *raw = (char *)malloc(16);
                     if (raw) {
