@@ -41,7 +41,6 @@ vanilla_data = parse_afl_plot_data("out_vanilla/default/plot_data")
 
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
-# Plot 1: Cumulative Path Discovery (Coverage Growth)
 if ai_data and ai_data['time']:
     ax1.plot(ai_data['time'], ai_data['paths'], label='AI-Augmented Mutator (Qwen2.5-Coder)', color='#d62728', linewidth=2)
 if vanilla_data and vanilla_data['time']:
