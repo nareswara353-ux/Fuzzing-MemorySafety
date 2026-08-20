@@ -1,11 +1,11 @@
 start_time        : 1787226280
-last_update       : 1787236036
-run_time          : 9755
+last_update       : 1787236096
+run_time          : 9815
 fuzzer_pid        : 698544
-cycles_done       : 24314
-cycles_wo_finds   : 20031
-time_wo_finds     : 9239
-fuzz_time         : 9755
+cycles_done       : 24722
+cycles_wo_finds   : 20439
+time_wo_finds     : 9299
+fuzz_time         : 9815
 calibration_time  : 0
 cmplog_time       : 0
 cmplog_tightness  : 0
@@ -13,16 +13,16 @@ cmplog_tight_new  : 0
 cmplog_size_derive: 0
 sync_time         : 0
 trim_time         : 0
-execs_done        : 1132884
-execs_per_sec     : 116.13
-execs_ps_last_min : 326.27
+execs_done        : 1152452
+execs_per_sec     : 117.41
+execs_ps_last_min : 325.49
 corpus_count      : 4
 corpus_favored    : 4
 corpus_found      : 3
 corpus_imported   : 0
 corpus_variable   : 0
 max_depth         : 4
-cur_item          : 2
+cur_item          : 1
 pending_favs      : 0
 pending_total     : 0
 stability         : 100.00%
@@ -33,7 +33,7 @@ total_tmout       : 1
 last_find         : 1787226796
 last_crash        : 1787226280
 last_hang         : 0
-execs_since_crash : 1132875
+execs_since_crash : 1152443
 exec_timeout      : 40
 slowest_exec_ms   : 5
 peak_rss_mb       : 13

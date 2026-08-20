@@ -24,17 +24,14 @@ def llm_synthesis_worker():
     """
     print("[+] Background LLM Generator Worker started.")
     while True:
-        # Jaga agar antrean buffer selalu memiliki 10-50 seed terstruktur
         if len(seed_pool) < 20:
             batch = []
             for _ in range(10):
                 magic = b"PACK"
                 version = 0x02
                 
-                # Strategi 1: Mutasi Trigger Crash (payload_len > chunk_count * 16)
                 if random.random() < 0.4:
                     chunks = random.randint(1, 2)
-                    # Alokasi kecil (16/32 bytes), payload besar (64 - 256 bytes)
                     p_len = (chunks * 16) + random.randint(16, 200)
                     body = b"\x7FE" + b"A" * (p_len - 2)
                 # Strategi 2: Eksplorasi Coverage Baru (State Transition)
