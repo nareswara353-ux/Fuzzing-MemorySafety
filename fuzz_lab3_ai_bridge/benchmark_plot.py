@@ -51,7 +51,6 @@ ax1.set_title('Empirical Comparison: Path Exploration & Throughput Over Time', f
 ax1.legend(loc='lower right')
 ax1.grid(True, linestyle=':', alpha=0.6)
 
-# Plot 2: Throughput (Executions per Second)
 if ai_data and ai_data['time']:
     ax2.plot(ai_data['time'], ai_data['speed'], label='AI IPC Bridge Speed', color='#d62728', alpha=0.8)
 if vanilla_data and vanilla_data['time']:
