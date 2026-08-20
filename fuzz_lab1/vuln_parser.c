@@ -31,7 +31,6 @@ void parse_payload(const uint8_t *data, size_t size) {
     size_t alloc_sz = (size_t)hdr->chunk_count * 16;
     if (alloc_sz == 0) alloc_sz = 16;
 
-    // PATCH: Validasi relasional ukuran buffer vs ukuran copy
     if (hdr->payload_len > alloc_sz) {
         return;
     }
