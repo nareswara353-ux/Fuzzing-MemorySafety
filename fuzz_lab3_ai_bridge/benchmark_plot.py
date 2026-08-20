@@ -17,7 +17,6 @@ def parse_afl_plot_data(filepath):
             if not row or row[0].startswith('#'):
                 continue
             try:
-                # Kolom AFL++ plot_data:
                 # 0: relative_time, 3: paths_total, 6: map_size, 10: execs_per_sec
                 t = float(row[0].strip())
                 p = int(row[3].strip())
