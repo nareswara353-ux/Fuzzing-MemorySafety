@@ -1,11 +1,11 @@
-start_time        : 1787152840
-last_update       : 1787155885
-run_time          : 3045
-fuzzer_pid        : 2964179
-cycles_done       : 21374
-cycles_wo_finds   : 15267
-time_wo_finds     : 2286
-fuzz_time         : 3044
+start_time        : 1787226280
+last_update       : 1787226941
+run_time          : 661
+fuzzer_pid        : 698544
+cycles_done       : 5305
+cycles_wo_finds   : 1022
+time_wo_finds     : 514
+fuzz_time         : 660
 calibration_time  : 0
 cmplog_time       : 0
 cmplog_tightness  : 0
@@ -13,9 +13,9 @@ cmplog_tight_new  : 0
 cmplog_size_derive: 0
 sync_time         : 0
 trim_time         : 0
-execs_done        : 977093
-execs_per_sec     : 320.88
-execs_ps_last_min : 319.82
+execs_done        : 220451
+execs_per_sec     : 333.36
+execs_ps_last_min : 336.55
 corpus_count      : 4
 corpus_favored    : 4
 corpus_found      : 3
@@ -30,23 +30,23 @@ bitmap_cvg        : 17.65%
 saved_crashes     : 1
 saved_hangs       : 0
 total_tmout       : 0
-last_find         : 1787153599
-last_crash        : 1787152840
+last_find         : 1787226796
+last_crash        : 1787226280
 last_hang         : 0
-execs_since_crash : 977078
+execs_since_crash : 220442
 exec_timeout      : 40
-slowest_exec_ms   : 4
-peak_rss_mb       : 14
+slowest_exec_ms   : 5
+peak_rss_mb       : 13
 cpu_affinity      : 0
 edges_found       : 6
 total_edges       : 34
 var_byte_count    : 0
 havoc_expansion   : 5
 auto_dict_entries : 0
-testcache_size    : 239
+testcache_size    : 287
 testcache_count   : 4
 testcache_evict   : 0
 afl_banner        : ./target_fuzz
 afl_version       : ++5.03a
 target_mode       : shmem_testcase default
-command_line      : afl-fuzz -i in -o out_ipc -m none -- ./target_fuzz @@
+command_line      : afl-fuzz -i in -o out_vanilla -m none -- ./target_fuzz @@
