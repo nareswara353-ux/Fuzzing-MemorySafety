@@ -30,16 +30,14 @@ def fuzz(buf, add_buf, max_size):
         except Exception:
             pass
 
-    # Prioritas 2: Fallback Invariant-Preserving Mutation
     mutated = bytearray(buf)
     if len(mutated) < 9:
         mutated = bytearray(b"PACK\x02\x01\x00\x10\x00" + b"B" * 16)
     else:
-        # Paksa integritas header
         mutated[0:4] = b"PACK"
         mutated[4] = 0x02
-        mutated[5:7] = struct.pack("<H", 1)   # Alloc 16 bytes
-        mutated[7:9] = struct.pack("<H", 64)  # Payload 64 bytes
+        mutated[5:7] = struct.pack("<H", 1)   
+        mutated[7:9] = struct.pack("<H", 64)  
         if len(mutated) < 73:
             mutated.extend(b"C" * (73 - len(mutated)))
 
