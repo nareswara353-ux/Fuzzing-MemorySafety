@@ -21,7 +21,6 @@ void parse_payload(const uint8_t *data, size_t size) {
 
     if (hdr->version != 0x02) return;
 
-    // Gate 3: State constraint
     if (hdr->chunk_count > 0x10) return;
 
     const uint8_t *body = data + sizeof(Header);
