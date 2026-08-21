@@ -222,3 +222,22 @@ def test_exploitability_analyzer():
             os.remove(result["poc_script"])
 
     os.remove(tf.name)
+
+# 13. Test Lab 14 Local SLM Grammar Mutator Bridge
+def test_slm_mutator_bridge():
+    import importlib.util
+    mut_path = "fuzz_lab14_slm_mutator/ai_mutator_slm.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 14 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_slm", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(99)
+    sample = bytearray(b"<PROMPT_REQ> OP=READ; ROLE=GUEST; AUTH_KEY=0x1337 </PROMPT_REQ>")
+    res = mut.fuzz(sample, None, 512)
+
+    assert b"<PROMPT_REQ>" in res, "SLM Mutator harus menjaga struktur XML/Prompt tag"
+    assert len(res) > 10
+    mut.deinit()

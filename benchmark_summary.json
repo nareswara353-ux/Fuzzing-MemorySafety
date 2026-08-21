@@ -132,6 +132,17 @@
     "stability": "100.00%"
   },
   {
+    "lab": "fuzz_lab14_slm_mutator",
+    "target": "default",
+    "runtime_seconds": "7",
+    "total_execs": "279",
+    "exec_speed": "37.91",
+    "corpus_count": 2,
+    "unique_crashes": 1,
+    "map_density": "25.00%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab11_taint_analysis",
     "target": "default",
     "runtime_seconds": "5",
