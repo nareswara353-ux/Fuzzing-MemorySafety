@@ -7,6 +7,8 @@
 ![LLVM](https://img.shields.io/badge/Compiler-LLVM_Clang_18+-green)
 ![LLM Backend](https://img.shields.io/badge/LLM-Qwen2.5--Coder--7B-purple)
 ![Sanitizer](https://img.shields.io/badge/Sanitizer-AddressSanitizer-orange)
+![Build Status](https://github.com/narezzzs/Master-PhD-Project/actions/workflows/ci.yml/badge.svg)
+
 
 ---
 
