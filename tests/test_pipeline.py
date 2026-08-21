@@ -94,3 +94,20 @@ def test_corpus_minimizer():
         assert orig_cnt == 6, "Total file input harus 6"
         assert min_cnt == 2, "Setelah deduplikasi harus tersisa tepat 2 seed unik"
         assert red_pct > 0, "Harus mencatat reduksi persentase ukuran"
+
+# 6. Test Lab 8 Distance Feedback Mutator Sanity
+def test_distance_guided_mutator():
+    import importlib.util
+    mut_path = "fuzz_lab8_branch_distance/ai_mutator_distance.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 8 mutator not yet created")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_distance", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(42)
+    sample = bytearray(b"VLLX" + b"\x00" * 12)
+    res = mut.fuzz(sample, None, 64)
+    assert len(res) >= 16, "Mutated buffer must retain minimum protocol size"
+    mut.deinit()
