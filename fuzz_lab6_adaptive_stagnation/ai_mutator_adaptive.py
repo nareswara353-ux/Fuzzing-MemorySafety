@@ -1,17 +1,14 @@
 import socket
 import os
 import struct
-import time
+import random
 
 SOCKET_PATH = "/tmp/llm_adaptive_bridge.sock"
 client_sock = None
 
-# Telemetri & State Stagnasi
 exec_count = 0
-last_interesting_exec = 0
-STAGNATION_THRESHOLD = 500  # Pemicu burst LLM jika 500 eksekusi tanpa edge baru
-burst_mode = False
-burst_budget = 0
+last_burst_exec = 0
+STAGNATION_THRESHOLD = 300  # Pemicu burst tiap 300 eksekusi
 
 def init(seed):
     global client_sock
@@ -23,36 +20,33 @@ def init(seed):
         client_sock = None
 
 def fuzz(buf, add_buf, max_size):
-    global client_sock, exec_count, last_interesting_exec, burst_mode, burst_budget
+    global client_sock, exec_count, last_burst_exec
     exec_count += 1
 
-    # Cek apakah mengalami stagnasi
-    if not burst_mode and (exec_count - last_interesting_exec > STAGNATION_THRESHOLD):
-        burst_mode = True
-        burst_budget = 10  # Minta 10 smart seed berturut-turut dari LLM
+    # Cek apakah sudah waktunya burst LLM
+    if exec_count - last_burst_exec > STAGNATION_THRESHOLD:
+        last_burst_exec = exec_count
+        
+        # 1. Coba ambil smart seed dari LLM Daemon
+        if client_sock:
+            try:
+                client_sock.sendall(b"REQ_BURST\n")
+                data = client_sock.recv(4096)
+                if data and data != b"EMPTY":
+                    return bytearray(data[:max_size])
+            except Exception:
+                pass
 
-    # Mode 1: AI Burst Mode (Ketika Stagnan)
-    if burst_mode and client_sock and burst_budget > 0:
-        burst_budget -= 1
-        try:
-            client_sock.sendall(b"REQ_BURST\n")
-            data = client_sock.recv(4096)
-            if data and data != b"EMPTY":
-                if burst_budget == 0:
-                    burst_mode = False
-                    last_interesting_exec = exec_count  # Reset counter
-                return bytearray(data[:max_size])
-        except Exception:
-            burst_mode = False
+        # 2. Smart Fallback Burst: Paksa trigger boundary constraint (chunk=1, len=64)
+        header = struct.pack("<4sBHH", b"PACK", 0x02, 1, 64)
+        payload = b"\x7f\x45" + (b"A" * 62)
+        return bytearray(header + payload)
 
-    # Mode 2: Ultra-Fast In-Memory Mutation (Non-Stagnant / Havoc Cepat)
+    # 3. Ultra-Fast Mutation: Modifikasi byte payload biasa
     mutated = bytearray(buf)
-    if len(mutated) >= 9:
-        # Mutasi bit/byte cepat tanpa jeda socket
-        idx = (exec_count % (len(mutated) - 8)) + 8
-        mutated[idx] = (mutated[idx] + 1) & 0xFF
-        return mutated
-
+    if len(mutated) > 9:
+        pos = random.randint(9, len(mutated) - 1)
+        mutated[pos] = (mutated[pos] + 1) & 0xFF
     return mutated
 
 def deinit():
