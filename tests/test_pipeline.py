@@ -135,7 +135,30 @@ def test_concolic_z3_solver():
     assert (((x << 3) & 0xFFFFFFFF) + (y >> 2)) & 0xFFFFFFFF == 0x1ff87307
     assert ((x * 17) + (y * 31)) & 0xFFFFFFFF == chk
 
-# 9. Test Lab 11 Dynamic Taint Analysis Mutator Logic
+# 9. Test Lab 10 Differential Semantic Fuzzing Oracle
+def test_differential_semantic_oracle():
+    target_bin = "fuzz_lab10_differential/diff_target_fuzz"
+    if not os.path.exists(target_bin):
+        pytest.skip("Differential target binary not compiled")
+
+    import tempfile
+    with tempfile.NamedTemporaryFile(delete=False) as tf_valid, tempfile.NamedTemporaryFile(delete=False) as tf_anomaly:
+        tf_valid.write(b"VAL=456")
+        tf_valid.flush()
+        
+        tf_anomaly.write(b"VAL=0456")
+        tf_anomaly.flush()
+
+        res_valid = subprocess.run([target_bin, tf_valid.name], capture_output=True)
+        assert res_valid.returncode == 0
+
+        res_anomaly = subprocess.run([target_bin, tf_anomaly.name], capture_output=True)
+        assert res_anomaly.returncode != 0
+
+    os.remove(tf_valid.name)
+    os.remove(tf_anomaly.name)
+
+# 10. Test Lab 11 Dynamic Taint Analysis Mutator Logic
 def test_taint_guided_mutator():
     import importlib.util
     mut_path = "fuzz_lab11_taint_analysis/ai_mutator_taint.py"
