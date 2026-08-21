@@ -1,0 +1,12 @@
+[
+  {
+    "crash_file": "id:000000,sig:06,src:000000+000001,time:2398,execs:320,op:ai_mutator_adaptive,pos:0",
+    "crash_type": "heap-buffer-overflow",
+    "fault_address": "0x7be4755e0020",
+    "operation": "WRITE",
+    "access_size": 64,
+    "root_cause_func": "parse_payload",
+    "source_location": "/home/narezzzs/Documents/GitHub/Master PhD Project/fuzz_lab6_adaptive_stagnation/target.c:33:5",
+    "return_code": 1
+  }
+]
