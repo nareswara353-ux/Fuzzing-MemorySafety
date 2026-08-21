@@ -111,3 +111,21 @@ def test_distance_guided_mutator():
     res = mut.fuzz(sample, None, 64)
     assert len(res) >= 16, "Mutated buffer must retain minimum protocol size"
     mut.deinit()
+
+# 7. Test Academic LaTeX Paper Generator
+def test_paper_generator():
+    from tools.generate_paper_report import collect_experiment_metrics, generate_latex_paper
+    import tempfile
+
+    exps = collect_experiment_metrics()
+    with tempfile.NamedTemporaryFile(suffix=".tex", delete=False) as tf:
+        tex_path = tf.name
+
+    generate_latex_paper(exps, output_tex=tex_path)
+    assert os.path.exists(tex_path), "File LaTeX gagal digenerate"
+    
+    with open(tex_path, "r") as f:
+        content = f.read()
+    assert "\\documentclass[conference]{IEEEtran}" in content, "Format template IEEE LaTeX tidak sesuai"
+    assert "Nareswara" in content, "Nama author tidak ditemukan di template"
+    os.remove(tex_path)
