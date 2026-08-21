@@ -1,0 +1,5 @@
+{
+  "target_module": "/tmp/target_14573.bc",
+  "extracted_integers": [0, 2, 9, 16, 69, 127, 18446744073709486080],
+  "hex_tokens": ["0x0", "0x10", "0x2", "0x45", "0x7F", "0x9", "0xFFFFFFFFFFFF0000"]
+}

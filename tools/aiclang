@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# aiclang: Compiler-Guided Neural Fuzzing Wrapper
+set -e
+
+EXTRACTOR_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/fuzz_lab4_llvm_pass/constraint_extractor"
+
+if [ "$#" -lt 1 ]; then
+    echo "Usage: aiclang [clang/compiler-flags] <source_files.c> -o <output_binary>"
+    echo "Example: aiclang -O1 target.c -o target_fuzz"
+    exit 1
+fi
+
+SOURCE_FILES=()
+OUTPUT_BIN=""
+ARGS=()
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -o)
+            OUTPUT_BIN="$2"
+            ARGS+=("-o" "$2")
+            shift 2
+            ;;
+        *.c|*.cpp)
+            SOURCE_FILES+=("$1")
+            ARGS+=("$1")
+            shift
+            ;;
+        *)
+            ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+if [ ${#SOURCE_FILES[@]} -eq 0 ]; then
+    echo "[-] Error: No C/C++ source files provided."
+    exit 1
+fi
+
+echo "[aiclang] Step 1/2: Generating LLVM bitcode & extracting invariants..."
+TMP_BC="/tmp/target_$$.bc"
+clang -O1 -emit-llvm -c "${SOURCE_FILES[0]}" -o "$TMP_BC"
+
+if [ -f "$EXTRACTOR_BIN" ]; then
+    "$EXTRACTOR_BIN" "$TMP_BC"
+    echo "[aiclang] Invariants extracted successfully -> extracted_constraints.json"
+else
+    echo "[aiclang] Warning: constraint_extractor binary not found at $EXTRACTOR_BIN (skipping analysis pass)"
+fi
+rm -f "$TMP_BC"
+
+echo "[aiclang] Step 2/2: Compiling instrumentation binary with AFL++ & ASan..."
+AFL_USE_ASAN=1 afl-clang-fast -g "${ARGS[@]}"
+
+echo "[aiclang] Build complete: ${OUTPUT_BIN:-a.out}"
