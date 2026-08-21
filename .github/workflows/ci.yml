@@ -39,7 +39,6 @@ jobs:
           clang -O1 -emit-llvm -c target.c -o target.bc
           ./constraint_extractor target.bc
           cat extracted_constraints.json
-          # Validasi bahwa JSON tidak kosong dan memiliki token yang valid
           python3 -c '
           import json
           with open("extracted_constraints.json") as f:
@@ -54,13 +53,7 @@ jobs:
           python3 tools/generate_dashboard.py
           ls -lh report_dashboard.html benchmark_summary.json
 
-      - name: Validate Python Mutators Syntax & Sanity
+      - name: Validate All Python Scripts Dynamically
         run: |
-          python3 -m py_compile fuzz_lab2_mutator/ai_mutator.py
-          python3 -m py_compile fuzz_lab3_daemon/ai_mutator.py
-          python3 -m py_compile fuzz_lab4_llvm_pass/ai_mutator.py
-          python3 -m py_compile fuzz_lab5_realworld_cjson/ai_mutator.py
-          python3 -m py_compile fuzz_lab6_adaptive_stagnation/ai_mutator_adaptive.py
-          python3 -m py_compile tools/crash_triager.py
-          python3 -m py_compile tools/generate_dashboard.py
-          echo "[CI] All Python mutator modules compiled and verified cleanly."
+          find . -name "*.py" -not -path "*/.*" -exec python3 -m py_compile {} +
+          echo "[CI] All discovered Python scripts compiled and verified successfully."
