@@ -1,0 +1,134 @@
+[
+  {
+    "lab": "fuzz_lab7_realworld_tinyxml2",
+    "target": "default",
+    "runtime_seconds": "7861",
+    "total_execs": "987728",
+    "exec_speed": "125.64",
+    "corpus_count": 144,
+    "unique_crashes": 0,
+    "map_density": "22.09%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab5_realworld_cjson",
+    "target": "default",
+    "runtime_seconds": "3141",
+    "total_execs": "175700",
+    "exec_speed": "55.93",
+    "corpus_count": 59,
+    "unique_crashes": 0,
+    "map_density": "16.50%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab2",
+    "target": "default",
+    "runtime_seconds": "221",
+    "total_execs": "108257",
+    "exec_speed": "489.81",
+    "corpus_count": 45,
+    "unique_crashes": 0,
+    "map_density": "53.57%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab2",
+    "target": "default",
+    "runtime_seconds": "2652",
+    "total_execs": "1231602",
+    "exec_speed": "464.35",
+    "corpus_count": 46,
+    "unique_crashes": 6,
+    "map_density": "57.14%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab1",
+    "target": "default",
+    "runtime_seconds": "417",
+    "total_execs": "208547",
+    "exec_speed": "499.68",
+    "corpus_count": 10,
+    "unique_crashes": 0,
+    "map_density": "56.00%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab1",
+    "target": "default",
+    "runtime_seconds": "703",
+    "total_execs": "351792",
+    "exec_speed": "500.21",
+    "corpus_count": 9,
+    "unique_crashes": 2,
+    "map_density": "32.35%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab3_ai_bridge",
+    "target": "default",
+    "runtime_seconds": "10055",
+    "total_execs": "1230388",
+    "exec_speed": "122.35",
+    "corpus_count": 4,
+    "unique_crashes": 1,
+    "map_density": "17.65%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab3_ai_bridge",
+    "target": "default",
+    "runtime_seconds": "94",
+    "total_execs": "42628",
+    "exec_speed": "452.45",
+    "corpus_count": 1,
+    "unique_crashes": 1,
+    "map_density": "5.88%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab3_ai_bridge",
+    "target": "default",
+    "runtime_seconds": "545",
+    "total_execs": "177313",
+    "exec_speed": "325.00",
+    "corpus_count": 3,
+    "unique_crashes": 1,
+    "map_density": "14.71%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab3_ai_bridge",
+    "target": "default",
+    "runtime_seconds": "3045",
+    "total_execs": "977093",
+    "exec_speed": "320.88",
+    "corpus_count": 4,
+    "unique_crashes": 1,
+    "map_density": "17.65%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab6_adaptive_stagnation",
+    "target": "default",
+    "runtime_seconds": "455",
+    "total_execs": "82195",
+    "exec_speed": "180.52",
+    "corpus_count": 3,
+    "unique_crashes": 1,
+    "map_density": "14.71%",
+    "stability": "100.00%"
+  },
+  {
+    "lab": "fuzz_lab4_llvm_pass",
+    "target": "default",
+    "runtime_seconds": "4037",
+    "total_execs": "22945",
+    "exec_speed": "5.68",
+    "corpus_count": 2,
+    "unique_crashes": 1,
+    "map_density": "8.82%",
+    "stability": "100.00%"
+  }
+]

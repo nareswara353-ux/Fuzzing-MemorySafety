@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compiler-Guided Neural Fuzzing | Unified Telemetry Dashboard</title>
+    <style>
+        :root {
+            --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --text-muted: #94a3b8;
+            --accent: #38bdf8; --border: #334155; --success: #22c55e; --danger: #ef4444;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        h1 { font-size: 1.8rem; margin: 0; color: var(--accent); }
+        p.subtitle { color: var(--text-muted); margin: 0.5rem 0 0 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; }
+        .card .title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .card .value { font-size: 1.8rem; font-weight: bold; margin-top: 0.5rem; color: var(--text); }
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #0f172a; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        code { background: #0b0f19; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: monospace; color: #f472b6; }
+        .badge { padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+        .badge-info { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+        .badge-success { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        footer { margin-top: 3rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 Compiler-Guided Neural Fuzzing Framework</h1>
+            <p class="subtitle">Unified Experimental Telemetry & Empirical Benchmark Aggregator | Generated on 2026-08-21 20:15:32</p>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <div class="title">Total Benchmark Labs</div>
+                <div class="value">12</div>
+            </div>
+            <div class="card">
+                <div class="title">Total Executions</div>
+                <div class="value">5,596,188</div>
+            </div>
+            <div class="card">
+                <div class="title">Total Discovered Seeds</div>
+                <div class="value">330</div>
+            </div>
+            <div class="card">
+                <div class="title">Vulnerabilities Caught</div>
+                <div class="value" style="color: var(--danger);">14</div>
+            </div>
+        </div>
+
+        <h2>📊 Empirical Experiment Matrix</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Lab Module</th>
+                    <th>Target Binary</th>
+                    <th>Total Execs</th>
+                    <th>Speed</th>
+                    <th>Corpus Queue</th>
+                    <th>Map Coverage</th>
+                    <th>Crash Status</th>
+                    <th>Stability</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr>
+            <td><strong>fuzz_lab7_realworld_tinyxml2</strong></td>
+            <td><code>default</code></td>
+            <td>987728</td>
+            <td>125.64/sec</td>
+            <td><span class='badge badge-info'>144 seeds</span></td>
+            <td>22.09%</td>
+            <td><span class='badge badge-success'>0 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab5_realworld_cjson</strong></td>
+            <td><code>default</code></td>
+            <td>175700</td>
+            <td>55.93/sec</td>
+            <td><span class='badge badge-info'>59 seeds</span></td>
+            <td>16.50%</td>
+            <td><span class='badge badge-success'>0 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab2</strong></td>
+            <td><code>default</code></td>
+            <td>108257</td>
+            <td>489.81/sec</td>
+            <td><span class='badge badge-info'>45 seeds</span></td>
+            <td>53.57%</td>
+            <td><span class='badge badge-success'>0 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab2</strong></td>
+            <td><code>default</code></td>
+            <td>1231602</td>
+            <td>464.35/sec</td>
+            <td><span class='badge badge-info'>46 seeds</span></td>
+            <td>57.14%</td>
+            <td><span class='badge badge-danger'>6 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab1</strong></td>
+            <td><code>default</code></td>
+            <td>208547</td>
+            <td>499.68/sec</td>
+            <td><span class='badge badge-info'>10 seeds</span></td>
+            <td>56.00%</td>
+            <td><span class='badge badge-success'>0 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab1</strong></td>
+            <td><code>default</code></td>
+            <td>351792</td>
+            <td>500.21/sec</td>
+            <td><span class='badge badge-info'>9 seeds</span></td>
+            <td>32.35%</td>
+            <td><span class='badge badge-danger'>2 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab3_ai_bridge</strong></td>
+            <td><code>default</code></td>
+            <td>1230388</td>
+            <td>122.35/sec</td>
+            <td><span class='badge badge-info'>4 seeds</span></td>
+            <td>17.65%</td>
+            <td><span class='badge badge-danger'>1 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab3_ai_bridge</strong></td>
+            <td><code>default</code></td>
+            <td>42628</td>
+            <td>452.45/sec</td>
+            <td><span class='badge badge-info'>1 seeds</span></td>
+            <td>5.88%</td>
+            <td><span class='badge badge-danger'>1 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab3_ai_bridge</strong></td>
+            <td><code>default</code></td>
+            <td>177313</td>
+            <td>325.00/sec</td>
+            <td><span class='badge badge-info'>3 seeds</span></td>
+            <td>14.71%</td>
+            <td><span class='badge badge-danger'>1 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab3_ai_bridge</strong></td>
+            <td><code>default</code></td>
+            <td>977093</td>
+            <td>320.88/sec</td>
+            <td><span class='badge badge-info'>4 seeds</span></td>
+            <td>17.65%</td>
+            <td><span class='badge badge-danger'>1 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab6_adaptive_stagnation</strong></td>
+            <td><code>default</code></td>
+            <td>82195</td>
+            <td>180.52/sec</td>
+            <td><span class='badge badge-info'>3 seeds</span></td>
+            <td>14.71%</td>
+            <td><span class='badge badge-danger'>1 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+        <tr>
+            <td><strong>fuzz_lab4_llvm_pass</strong></td>
+            <td><code>default</code></td>
+            <td>22945</td>
+            <td>5.68/sec</td>
+            <td><span class='badge badge-info'>2 seeds</span></td>
+            <td>8.82%</td>
+            <td><span class='badge badge-danger'>1 Crashes</span></td>
+            <td>100.00%</td>
+        </tr>
+        
+            </tbody>
+        </table>
+
+        <footer>
+            Master / Ph.D. Research Track &mdash; Software & Systems Security &bull; Automated Telemetry Engine
+        </footer>
+    </div>
+</body>
+</html>
