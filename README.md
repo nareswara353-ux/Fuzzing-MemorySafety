@@ -10,7 +10,7 @@
 
 ---
 
-## 🔬 Project Overview
+## Project Overview
 
 Modern automated vulnerability discovery faces a fundamental trade-off: **fuzzing throughput** (thousands of executions/second) vs. **semantic awareness** (passing complex input grammars and multi-byte magic assertions). Traditional random mutators (Havoc) struggle with deep nested branches and magic headers, while symbolic execution suffers from path explosion.
 
@@ -23,7 +23,7 @@ This project implements a **closed-loop compiler-guided neural fuzzing architect
 
 ---
 
-## 🏛️ System Architecture
+## System Architecture
 
 ```
 +-----------------------------------------------------------------------------+
@@ -75,7 +75,7 @@ This project implements a **closed-loop compiler-guided neural fuzzing architect
 
 ---
 
-## 🧪 Laboratory Breakdown (Lab 1 – Lab 5)
+## Laboratory Breakdown (Lab 1 – Lab 5)
 
 | Lab Module | Core Technical Focus | Key Engineering Artifacts | Experimental Outcome |
 |---|---|---|---|
@@ -87,7 +87,7 @@ This project implements a **closed-loop compiler-guided neural fuzzing architect
 
 ---
 
-## 📊 Empirical Evaluation & Results
+## Empirical Evaluation & Results
 
 ### 1. Exploitation on Binary Target (Lab 4)
 
@@ -104,7 +104,7 @@ Benchmarked over a 50-minute continuous fuzzing campaign on cJSON:
 
 ---
 
-## 🚀 Quickstart & Reproduction
+## Quickstart & Reproduction
 
 ### Prerequisites
 
@@ -147,7 +147,7 @@ afl-fuzz -i in -o out_cjson -m none -- ./cjson_fuzz @@
 
 ---
 
-## 📜 Research Contributions & Potential
+## Research Contributions & Potential
 
 - **Zero-Annotation Invariant Extraction:** Fully automated constraint discovery from LLVM IR, eliminating the need for manual fuzzing dictionary construction.
 - **Hybrid Mutation Synthesis:** Resolves the grammar barrier for text-based parsers without sacrificing CPU fuzzing velocity.
@@ -155,9 +155,9 @@ afl-fuzz -i in -o out_cjson -m none -- ./cjson_fuzz @@
 
 ---
 
-## 👨‍💼 Author & Project Info
+## Author & Project Info
 
-- **Author:** Nareswar
+- **Author:** Radhitya Putra Nareswara
 - **Project:** Master / Ph.D. Research Track — Software & Systems Security
 
 ---
