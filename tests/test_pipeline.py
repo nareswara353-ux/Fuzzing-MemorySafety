@@ -134,3 +134,23 @@ def test_concolic_z3_solver():
     assert (x ^ y) == 0x5a5a5a5a
     assert (((x << 3) & 0xFFFFFFFF) + (y >> 2)) & 0xFFFFFFFF == 0x1ff87307
     assert ((x * 17) + (y * 31)) & 0xFFFFFFFF == chk
+
+# 9. Test Lab 11 Dynamic Taint Analysis Mutator Logic
+def test_taint_guided_mutator():
+    import importlib.util
+    mut_path = "fuzz_lab11_taint_analysis/ai_mutator_taint.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 11 taint mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_taint", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(42)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+    
+    assert res[:4] == b"DTA!", "Taint mutator harus mengunci Header DTA!"
+    assert res[8:10] == b"AA", "Taint mutator harus mengunci Command AA"
+    assert struct.unpack("<I", res[16:20])[0] == 0x1337C0DE, "Taint mutator harus mengunci Target Key"
+    mut.deinit()

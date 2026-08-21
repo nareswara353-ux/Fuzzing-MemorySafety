@@ -121,6 +121,17 @@
     "stability": "100.00%"
   },
   {
+    "lab": "fuzz_lab11_taint_analysis",
+    "target": "default",
+    "runtime_seconds": "5",
+    "total_execs": "337",
+    "exec_speed": "62.44",
+    "corpus_count": 2,
+    "unique_crashes": 1,
+    "map_density": "36.67%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab6_adaptive_stagnation",
     "target": "default",
     "runtime_seconds": "455",
