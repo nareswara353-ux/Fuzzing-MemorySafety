@@ -129,3 +129,22 @@ def test_paper_generator():
     assert "\\documentclass[conference]{IEEEtran}" in content, "Format template IEEE LaTeX tidak sesuai"
     assert "Nareswara" in content, "Nama author tidak ditemukan di template"
     os.remove(tex_path)
+
+# 8. Test Lab 9 SMT Z3 Concolic Solver
+def test_concolic_z3_solver():
+    import importlib.util
+    solver_path = "fuzz_lab9_concolic_z3/concolic_solver.py"
+    if not os.path.exists(solver_path):
+        pytest.skip("Lab 9 solver not found")
+
+    spec = importlib.util.spec_from_file_location("concolic_solver", solver_path)
+    solver = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(solver)
+
+    sol = solver.solve_symbolic_guards()
+    assert sol is not None, "Z3 Solver harus menemukan solusi satisfiability (SAT)"
+    magic, x, y, chk = sol
+    assert magic == 0x5a544d53, "Magic header mismatch"
+    assert (x ^ y) == 0x5a5a5a5a, "Bitwise XOR constraint violated"
+    assert ((x << 3) + (y >> 2)) & 0xFFFFFFFF == 0x1bf754a5, "Bit shift constraint violated"
+    assert ((x * 17) + (y * 31)) & 0xFFFFFFFF == chk, "Checksum equation violated"
