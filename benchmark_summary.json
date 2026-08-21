@@ -1,5 +1,16 @@
 [
   {
+    "lab": "fuzz_lab12_persistent_mode",
+    "target": "deferred",
+    "runtime_seconds": "9",
+    "total_execs": "1092",
+    "exec_speed": "110.78",
+    "corpus_count": 1,
+    "unique_crashes": 1,
+    "map_density": "18.75%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab7_realworld_tinyxml2",
     "target": "default",
     "runtime_seconds": "7861",

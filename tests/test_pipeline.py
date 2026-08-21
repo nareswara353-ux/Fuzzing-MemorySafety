@@ -177,3 +177,23 @@ def test_taint_guided_mutator():
     assert res[8:10] == b"AA", "Taint mutator harus mengunci Command AA"
     assert struct.unpack("<I", res[16:20])[0] == 0x1337C0DE, "Taint mutator harus mengunci Target Key"
     mut.deinit()
+
+# 11. Test Lab 12 In-Memory Persistent Mutator Integrity
+def test_persistent_mutator():
+    import importlib.util
+    mut_path = "fuzz_lab12_persistent_mode/ai_mutator_persistent.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 12 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_persistent", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(1337)
+    sample = bytearray(b"FAST\x04\x00\x00\x00XXXX")
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"FAST", "Persistent mutator harus mempertahankan FAST magic header"
+    assert struct.unpack("<I", res[4:8])[0] == 4, "Payload length harus 4 bytes"
+    assert len(res) >= 12
+    mut.deinit()
