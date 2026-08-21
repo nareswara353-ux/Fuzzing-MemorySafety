@@ -241,3 +241,19 @@ def test_slm_mutator_bridge():
     assert b"<PROMPT_REQ>" in res, "SLM Mutator harus menjaga struktur XML/Prompt tag"
     assert len(res) > 10
     mut.deinit()
+
+# 14. Test Lab 15 Empirical Statistical Evaluation Engine
+def test_empirical_evaluator():
+    from tools.empirical_evaluator import run_fuzzbench_evaluation, calculate_vargha_delaney_a12
+
+    treatment = [100, 105, 110, 115, 120]
+    control = [50, 55, 60, 65, 70]
+
+    res = run_fuzzbench_evaluation(treatment, control)
+    assert res["is_statistically_significant"] is True, "Treatment harus terbukti signifikan"
+    assert res["vargha_delaney_a12"] == 1.0, "A12 harus 1.0 untuk populasi dominan mutlak"
+    assert res["effect_size"] == "Large Superiority (Significant)"
+
+    # Uji kasus data identik (A12 = 0.5, tidak ada efek)
+    identical_a12 = calculate_vargha_delaney_a12([10, 20], [10, 20])
+    assert 0.4 <= identical_a12 <= 0.6

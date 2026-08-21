@@ -1,0 +1,32 @@
+{
+  "benchmark_metadata": {
+    "standards": "Google FuzzBench / USENIX Security Criteria",
+    "iterations_per_target": 10,
+    "confidence_threshold": 0.95
+  },
+  "branch_coverage_analysis": {
+    "trials_count": 10,
+    "treatment_mean": 149.4,
+    "control_mean": 88.5,
+    "mann_whitney_u": 0.0,
+    "p_value": 0.000157,
+    "is_statistically_significant": true,
+    "vargha_delaney_a12": 1.0,
+    "effect_size": "Large Superiority (Significant)"
+  },
+  "time_to_crash_analysis": {
+    "treatment_mean_seconds": 1.08,
+    "control_mean_seconds": 52.62,
+    "speedup_factor": 48.7,
+    "statistical_metrics": {
+      "trials_count": 10,
+      "treatment_mean": 97.93,
+      "control_mean": 1.96,
+      "mann_whitney_u": 0.0,
+      "p_value": 0.000157,
+      "is_statistically_significant": true,
+      "vargha_delaney_a12": 1.0,
+      "effect_size": "Large Superiority (Significant)"
+    }
+  }
+}
