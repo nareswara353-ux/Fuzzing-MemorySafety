@@ -12,26 +12,26 @@ void evaluate_concolic_payload(const uint8_t *data, size_t size) {
     uint32_t checksum = *(uint32_t*)(data + 12);
 
     // Guard 1: Magic Header Check ("SMTZ")
-    if (magic != 0x5a544d53) return; // 'SMTZ' in Little-Endian
+    if (magic != 0x5a544d53) return;
 
-    // Guard 2: Complex Bitwise Non-Linear Constraint Equations
+    // Guard 2: Non-Linear Bitwise Equations
     // Equation A: x ^ y == 0x5a5a5a5a
     if ((x ^ y) != 0x5a5a5a5a) return;
 
-    // Equation B: (x << 3) + (y >> 2) == 0x1bf754a5
-    if (((x << 3) + (y >> 2)) != 0x1bf754a5) return;
+    // Equation B: (x << 3) + (y >> 2) == 0x1ff87307
+    if (((x << 3) + (y >> 2)) != 0x1ff87307) return;
 
     // Equation C: (x * 17) + (y * 31) == checksum
     if (((x * 17) + (y * 31)) != checksum) return;
 
-    // SINK: Heap Buffer Overflow (AddressSanitizer Trap)
+    // SINK: ASan Heap Buffer Overflow
     printf("[+] SMT Z3 CONCOLIC SOLVER SUCCESS! All Bitwise Equations Solved!\n");
     volatile char *leak_buf = (volatile char *)malloc(16);
     for (int i = 0; i < 256; i++) {
-        leak_buf[i] = 'Z'; // ASan Trigger
+        leak_buf[i] = 'Z';
     }
     free((void*)leak_buf);
-    *(volatile int *)0 = 0xDEADBEEF; // Crash Trap Fallback
+    *(volatile int *)0 = 0xDEADBEEF;
 }
 
 int main(int argc, char **argv) {
