@@ -28,7 +28,7 @@ jobs:
       - name: Compile Standalone LLVM IR Constraint Extractor
         run: |
           cd fuzz_lab4_llvm_pass
-          clang++ -O3 constraint_extractor.cpp \
+          clang++ -std=c++17 -O3 constraint_extractor.cpp \
             $(llvm-config --cxxflags --ldflags --system-libs --libs core irreader support) \
             -o constraint_extractor
           ls -la constraint_extractor
@@ -51,7 +51,8 @@ jobs:
       - name: Verify Tooling & Telemetry Dashboard Generation
         run: |
           python3 tools/generate_dashboard.py
-          ls -lh report_dashboard.html benchmark_summary.json
+          test -f report_dashboard.html
+          test -f benchmark_summary.json
 
       - name: Validate All Python Scripts Dynamically
         run: |

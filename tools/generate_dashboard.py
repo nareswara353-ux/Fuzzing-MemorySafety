@@ -18,7 +18,6 @@ def parse_fuzzer_stats(stats_path):
 
 def scan_all_experiments(base_dir="."):
     experiments = []
-    # Cari semua direktori fuzzer_stats di seluruh lab
     stat_files = glob.glob(os.path.join(base_dir, "**/fuzzer_stats"), recursive=True)
     
     for sf in stat_files:
@@ -26,16 +25,13 @@ def scan_all_experiments(base_dir="."):
         lab_folder = sf.split(os.sep)[1] if len(sf.split(os.sep)) > 1 else "Unknown"
         out_dir = os.path.dirname(sf)
         
-        # Hitung corpus queue dan crashes
         queue_count = len([f for f in glob.glob(os.path.join(out_dir, "queue", "id:*"))])
         crash_count = len([f for f in glob.glob(os.path.join(out_dir, "crashes", "id:*")) if "README" not in f])
         
-        # Ekstraksi metrik penting
         execs = stats.get("execs_done", "0")
         exec_speed = stats.get("execs_per_sec", "0")
         map_density = stats.get("bitmap_cvg", stats.get("map_size", "N/A"))
         stability = stats.get("stability", "100.00%")
-        runtime = stats.get("run_time", "N/A")
         
         experiments.append({
             "lab": lab_folder,
@@ -52,21 +48,28 @@ def scan_all_experiments(base_dir="."):
 
 def generate_html_dashboard(experiments, output_html="report_dashboard.html"):
     rows = ""
-    for exp in experiments:
-        crash_badge = f"<span class='badge badge-danger'>{exp['unique_crashes']} Crashes</span>" if exp['unique_crashes'] > 0 else "<span class='badge badge-success'>0 Crashes</span>"
-        rows += f"""
-        <tr>
-            <td><strong>{exp['lab']}</strong></td>
-            <td><code>{exp['target']}</code></td>
-            <td>{exp['total_execs']}</td>
-            <td>{exp['exec_speed']}/sec</td>
-            <td><span class='badge badge-info'>{exp['corpus_count']} seeds</span></td>
-            <td>{exp['map_density']}</td>
-            <td>{crash_badge}</td>
-            <td>{exp['stability']}</td>
-        </tr>
-        """
+    if not experiments:
+        rows = "<tr><td colspan='8' style='text-align:center; color: var(--text-muted);'>No active fuzzing runs detected (Clean CI Environment).</td></tr>"
+    else:
+        for exp in experiments:
+            crash_badge = f"<span class='badge badge-danger'>{exp['unique_crashes']} Crashes</span>" if exp['unique_crashes'] > 0 else "<span class='badge badge-success'>0 Crashes</span>"
+            rows += f"""
+            <tr>
+                <td><strong>{exp['lab']}</strong></td>
+                <td><code>{exp['target']}</code></td>
+                <td>{exp['total_execs']}</td>
+                <td>{exp['exec_speed']}/sec</td>
+                <td><span class='badge badge-info'>{exp['corpus_count']} seeds</span></td>
+                <td>{exp['map_density']}</td>
+                <td>{crash_badge}</td>
+                <td>{exp['stability']}</td>
+            </tr>
+            """
     
+    total_execs = sum(int(e['total_execs']) for e in experiments if str(e.get('total_execs', '')).isdigit())
+    total_seeds = sum(e['corpus_count'] for e in experiments)
+    total_crashes = sum(e['unique_crashes'] for e in experiments)
+
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -113,15 +116,15 @@ def generate_html_dashboard(experiments, output_html="report_dashboard.html"):
             </div>
             <div class="card">
                 <div class="title">Total Executions</div>
-                <div class="value">{sum(int(e['total_execs']) for e in experiments if e['total_execs'].isdigit()):,}</div>
+                <div class="value">{total_execs:,}</div>
             </div>
             <div class="card">
                 <div class="title">Total Discovered Seeds</div>
-                <div class="value">{sum(e['corpus_count'] for e in experiments):,}</div>
+                <div class="value">{total_seeds:,}</div>
             </div>
             <div class="card">
                 <div class="title">Vulnerabilities Caught</div>
-                <div class="value" style="color: var(--danger);">{sum(e['unique_crashes'] for e in experiments)}</div>
+                <div class="value" style="color: var(--danger);">{total_crashes}</div>
             </div>
         </div>
 
@@ -157,10 +160,7 @@ def generate_html_dashboard(experiments, output_html="report_dashboard.html"):
 
 if __name__ == "__main__":
     exps = scan_all_experiments()
-    if exps:
-        generate_html_dashboard(exps)
-        with open("benchmark_summary.json", "w") as jf:
-            json.dump(exps, jf, indent=2)
-        print("[+] Telemetry JSON exported: benchmark_summary.json")
-    else:
-        print("[-] No AFL++ output directories found.")
+    generate_html_dashboard(exps)
+    with open("benchmark_summary.json", "w") as jf:
+        json.dump(exps, jf, indent=2)
+    print("[+] Telemetry JSON exported: benchmark_summary.json")
