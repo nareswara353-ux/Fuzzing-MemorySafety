@@ -197,3 +197,28 @@ def test_persistent_mutator():
     assert struct.unpack("<I", res[4:8])[0] == 4, "Payload length harus 4 bytes"
     assert len(res) >= 12
     mut.deinit()
+
+# 12. Test Lab 13 Automated Exploitability Analyzer & PoC Generator
+def test_exploitability_analyzer():
+    from tools.exploit_analyzer import analyze_crash_exploitability
+    import tempfile
+
+    target_bin = "fuzz_lab13_exploitability_analyzer/target_vuln_bin"
+    if not os.path.exists(target_bin):
+        pytest.skip("Lab 13 binary not compiled")
+
+    with tempfile.NamedTemporaryFile(delete=False) as tf:
+        # Buat payload pembajakan control-flow
+        tf.write(b"PWN!" + b"B" * 32 + b"\x41\x41\x41\x41\x00\x00\x00\x00")
+        tf.flush()
+        
+        result = analyze_crash_exploitability(target_bin, tf.name)
+        assert result["severity"] == "CRITICAL", "Tingkat keparahan harus terdeteksi CRITICAL"
+        assert "Control-Flow Hijack" in result["verdict"], "Harus mendeteksi Control-Flow Hijack"
+        assert os.path.exists(result["poc_script"]), "File Python PoC script harus terbuat"
+        
+        # Bersihkan file sementara
+        if os.path.exists(result["poc_script"]):
+            os.remove(result["poc_script"])
+
+    os.remove(tf.name)
