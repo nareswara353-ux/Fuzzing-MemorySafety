@@ -75,3 +75,22 @@ def test_dashboard_generator():
         content = f.read()
     assert "Compiler-Guided Neural Fuzzing" in content, "Judul dashboard tidak ditemukan di HTML"
     os.remove(test_html)
+
+# 5. Test Corpus Minimizer Functionality
+def test_corpus_minimizer():
+    from tools.corpus_minimizer import minimize_corpus
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp_in, tempfile.TemporaryDirectory() as tmp_out:
+        # Buat seed tiruan (termasuk duplikat)
+        for i in range(5):
+            with open(os.path.join(tmp_in, f"seed_{i}.bin"), "wb") as f:
+                f.write(b"DUPLICATE_DATA_PAYLOAD")
+        with open(os.path.join(tmp_in, "unique_seed.bin"), "wb") as f:
+            f.write(b"TOTALLY_UNIQUE_PAYLOAD_123")
+
+        orig_cnt, min_cnt, red_pct = minimize_corpus(tmp_in, tmp_out)
+        
+        assert orig_cnt == 6, "Total file input harus 6"
+        assert min_cnt == 2, "Setelah deduplikasi harus tersisa tepat 2 seed unik"
+        assert red_pct > 0, "Harus mencatat reduksi persentase ukuran"
