@@ -4,26 +4,25 @@ import json
 
 def calculate_vargha_delaney_a12(treatment, control):
     """
-    Menghitung Vargha-Delaney A12 effect size.
+    Menghitung Vargha-Delaney A12 effect size via exact pairwise evaluation.
+    A12 = 0.5: Identik (No effect)
     A12 > 0.5: Treatment lebih unggul dari Control
-    A12 >= 0.71: Large effect size (standar FuzzBench/ICSE/USENIX)
+    A12 >= 0.71: Large effect size (Standar Google FuzzBench / USENIX Security)
     """
     m = len(treatment)
     n = len(control)
     if m == 0 or n == 0:
         return 0.5
 
-    # Gabungkan dan hitung rank
-    all_data = [(val, 'treatment') for val in treatment] + [(val, 'control') for val in control]
-    all_data.sort(key=lambda x: x[0])
+    score = 0.0
+    for x in treatment:
+        for y in control:
+            if x > y:
+                score += 1.0
+            elif x == y:
+                score += 0.5
 
-    rank_sum_treatment = 0
-    for idx, item in enumerate(all_data, start=1):
-        if item[1] == 'treatment':
-            rank_sum_treatment += idx
-
-    # Rumus Standar: A12 = (R1 / m - (m + 1) / 2) / n
-    a12 = (rank_sum_treatment / m - (m + 1) / 2.0) / n
+    a12 = score / (m * n)
     return round(float(a12), 4)
 
 def mann_whitney_u_test(treatment, control):
@@ -35,15 +34,18 @@ def mann_whitney_u_test(treatment, control):
     if m == 0 or n == 0:
         return 0, 1.0
 
-    all_data = [(val, 'treatment') for val in treatment] + [(val, 'control') for val in control]
-    all_data.sort(key=lambda x: x[0])
+    score = 0.0
+    for x in treatment:
+        for y in control:
+            if x > y:
+                score += 1.0
+            elif x == y:
+                score += 0.5
 
-    r1 = sum(idx for idx, item in enumerate(all_data, start=1) if item[1] == 'treatment')
-    u1 = r1 - (m * (m + 1)) / 2.0
+    u1 = score
     u2 = (m * n) - u1
     u = min(u1, u2)
 
-    # Nilai mean & varians U
     mean_u = (m * n) / 2.0
     sigma_u = math.sqrt((m * n * (m + n + 1)) / 12.0)
     
@@ -51,7 +53,6 @@ def mann_whitney_u_test(treatment, control):
         return u, 1.0
 
     z = abs(u - mean_u) / sigma_u
-    # Estimasi p-value complementary error function (Normal approx)
     p_value = math.erfc(z / math.sqrt(2))
     return round(float(u), 2), round(float(p_value), 6)
 
@@ -83,7 +84,6 @@ def run_fuzzbench_evaluation(treatment_runs, control_runs):
     }
 
 if __name__ == "__main__":
-    # Benchmark Sintetik: 10 Trial Branch Coverage (Novel LLVM-AI vs Vanilla AFL)
     novel_ai = [142, 148, 155, 140, 150, 153, 147, 152, 149, 158]
     vanilla_afl = [85, 90, 88, 92, 87, 84, 89, 91, 86, 93]
 
