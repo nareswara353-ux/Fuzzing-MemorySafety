@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <sys/mman.h>
 
 #define MAX_BRANCHES 16
 
@@ -32,9 +30,11 @@ void __record_branch_distance(uint32_t branch_id, int64_t diff) {
 
 __attribute__((destructor))
 void __dump_distance_rt(void) {
-    FILE *f = fopen("/tmp/branch_distance.bin", "wb");
+    // Tulis ke temp file terlebih dahulu, lalu rename secara atomik
+    FILE *f = fopen("/tmp/branch_distance.tmp", "wb");
     if (f) {
         fwrite(&g_table, sizeof(DistanceTable), 1, f);
         fclose(f);
+        rename("/tmp/branch_distance.tmp", "/tmp/branch_distance.bin");
     }
 }

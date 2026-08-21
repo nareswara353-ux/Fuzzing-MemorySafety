@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <string.h>
 
-// Deklarasi runtime probe eksternal
 extern void __record_branch_distance(uint32_t branch_id, int64_t diff);
 
 void process_data(const uint8_t *data, size_t size) {
@@ -14,26 +13,31 @@ void process_data(const uint8_t *data, size_t size) {
     int32_t val2 = *(int32_t*)(data + 8);
     int32_t checksum = *(int32_t*)(data + 12);
 
-    // Stage 1: Header Check
-    int64_t d1 = (int64_t)magic - (int64_t)0x584c4c56; // "VLLX"
+    // Stage 1: Header Guard
+    int64_t d1 = (int64_t)magic - (int64_t)0x584c4c56;
     __record_branch_distance(1, d1 >= 0 ? d1 : -d1);
     if (magic != 0x584c4c56) return;
 
-    // Stage 2: Arithmetic Constraint (val1 + val2 == 0x1337)
+    // Stage 2: Arithmetic Sum Guard (val1 + val2 == 0x1337)
     int64_t d2 = (int64_t)(val1 + val2) - (int64_t)0x1337;
     __record_branch_distance(2, d2 >= 0 ? d2 : -d2);
     if ((val1 + val2) != 0x1337) return;
 
-    // Stage 3: Dynamic Multiplier (val1 * 3 == checksum)
+    // Stage 3: Multiplier Guard (val1 * 3 == checksum)
     int64_t d3 = (int64_t)(val1 * 3) - (int64_t)checksum;
     __record_branch_distance(3, d3 >= 0 ? d3 : -d3);
     if ((val1 * 3) != checksum) return;
 
-    // Stage 4: Trigger ASan Heap Buffer Overflow
-    printf("[!] All Arithmetic Guards Passed! Triggering Target ASan Crash...\n");
-    char *buf = (char *)malloc(16);
-    memset(buf, 'B', 64); // ASan Heap Buffer Overflow
-    free(buf);
+    // Trigger Root Cause Vulnerability (Out-of-Bounds Heap Write + Crash Trap)
+    printf("[!] ALL GUARDS BYPASSED! Executing ASan Heap Overflow Sink...\n");
+    volatile char *heap_buf = (volatile char *)malloc(16);
+    for (int i = 0; i < 512; i++) {
+        heap_buf[i] = 'X'; // ASan Heap Buffer Overflow
+    }
+    free((void*)heap_buf);
+    
+    // Explicit crash signal fallback
+    *(volatile int *)0 = 0xDEADBEEF;
 }
 
 int main(int argc, char **argv) {

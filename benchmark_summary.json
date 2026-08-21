@@ -110,6 +110,17 @@
     "stability": "100.00%"
   },
   {
+    "lab": "fuzz_lab8_branch_distance",
+    "target": "default",
+    "runtime_seconds": "21",
+    "total_execs": "1076",
+    "exec_speed": "50.56",
+    "corpus_count": 1,
+    "unique_crashes": 1,
+    "map_density": "32.26%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab6_adaptive_stagnation",
     "target": "default",
     "runtime_seconds": "455",
