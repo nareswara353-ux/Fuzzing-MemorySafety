@@ -257,3 +257,23 @@ def test_empirical_evaluator():
     # Uji kasus data identik (A12 = 0.5, tidak ada efek)
     identical_a12 = calculate_vargha_delaney_a12([10, 20], [10, 20])
     assert 0.4 <= identical_a12 <= 0.6
+
+# 15. Test Lab 16 End-to-End Orchestrator CLI
+def test_fuzzer_cli_orchestrator():
+    cli_path = "./fuzzer"
+    assert os.path.exists(cli_path), "Wrapper executable ./fuzzer harus ada"
+
+    # Test Help Output
+    res_help = subprocess.run([cli_path, "--help"], capture_output=True, text=True)
+    assert res_help.returncode == 0
+    assert "Compiler-Guided Neural Fuzzing Framework" in res_help.stdout
+
+    # Test Subcommand Dry Run
+    res_run = subprocess.run([cli_path, "run", "--mode", "concolic"], capture_output=True, text=True)
+    assert res_run.returncode == 0
+    assert "CONCOLIC" in res_run.stdout
+
+    # Test Subcommand Benchmark
+    res_bench = subprocess.run([cli_path, "benchmark"], capture_output=True, text=True)
+    assert res_bench.returncode == 0
+    assert "Statistical significance" in res_bench.stdout
