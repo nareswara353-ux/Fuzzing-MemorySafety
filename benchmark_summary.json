@@ -132,6 +132,17 @@
     "stability": "100.00%"
   },
   {
+    "lab": "fuzz_lab10_differential",
+    "target": "default",
+    "runtime_seconds": "9",
+    "total_execs": "411",
+    "exec_speed": "43.87",
+    "corpus_count": 4,
+    "unique_crashes": 1,
+    "map_density": "20.00%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab4_llvm_pass",
     "target": "default",
     "runtime_seconds": "4037",
