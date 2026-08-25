@@ -198,6 +198,17 @@
     "stability": "100.00%"
   },
   {
+    "lab": "fuzz_lab21_wasm_jit",
+    "target": "default",
+    "runtime_seconds": "1",
+    "total_execs": "136",
+    "exec_speed": "70.94",
+    "corpus_count": 4,
+    "unique_crashes": 1,
+    "map_density": "37.50%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab10_differential",
     "target": "default",
     "runtime_seconds": "9",

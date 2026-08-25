@@ -380,3 +380,25 @@ def test_stateful_protocol_mutator():
     assert res[6] == 0x02, "Message 2 harus bertipe MSG_AUTH"
     assert struct.unpack("<I", res[8:12])[0] == 0x1337C0DE, "Auth token harus valid"
     mut.deinit()
+
+# 20. Test Lab 21 WebAssembly Bytecode Structure Mutator
+def test_wasm_bytecode_mutator():
+    import importlib.util
+    mut_path = "fuzz_lab21_wasm_jit/ai_mutator_wasm.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 21 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_wasm", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(555)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 128)
+
+    # Validasi WASM Header
+    assert res[:4] == b"\x00asm", "WASM magic header mismatch"
+    assert res[4:8] == b"\x01\x00\x00\x00", "WASM version mismatch"
+    # Validasi Type Section ID (0x01)
+    assert res[8] == 0x01
+    mut.deinit()
