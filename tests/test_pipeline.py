@@ -355,3 +355,28 @@ def test_firmware_emulator_and_mutator():
         crash_pkt = struct.pack("<4sIBH64s", b"FIRM", 0x00010002, 0xEE, 32, b"A" * 64)
         run_res = emu.execute_packet(crash_pkt)
         assert run_res["crashed"] is True, "Overflow paket firmware harus memicu crash"
+
+# 19. Test Lab 20 Stateful Protocol Sequence Mutator
+def test_stateful_protocol_mutator():
+    import importlib.util
+    mut_path = "fuzz_lab20_stateful_network/ai_mutator_stateful.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 20 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_stateful", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(123)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 128)
+
+    # Validasi Header Paket Pertama (HELLO -> Type 0x01, Len 4, 'HELO')
+    assert res[0] == 0x01, "Message 1 harus bertipe MSG_HELLO"
+    assert res[1] == 4
+    assert res[2:6] == b"HELO"
+
+    # Validasi Header Paket Kedua (AUTH -> Type 0x02, Len 4, 0x1337C0DE)
+    assert res[6] == 0x02, "Message 2 harus bertipe MSG_AUTH"
+    assert struct.unpack("<I", res[8:12])[0] == 0x1337C0DE, "Auth token harus valid"
+    mut.deinit()

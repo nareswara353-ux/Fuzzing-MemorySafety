@@ -99,6 +99,17 @@
     "stability": "100.00%"
   },
   {
+    "lab": "fuzz_lab20_stateful_network",
+    "target": "default",
+    "runtime_seconds": "2",
+    "total_execs": "184",
+    "exec_speed": "74.52",
+    "corpus_count": 1,
+    "unique_crashes": 1,
+    "map_density": "36.36%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab3_ai_bridge",
     "target": "default",
     "runtime_seconds": "10055",
