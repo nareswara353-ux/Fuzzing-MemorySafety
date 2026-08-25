@@ -324,3 +324,34 @@ def test_blackbox_qemu_mutator_and_runner():
     if os.path.exists(target_bin) and os.path.exists(crash_file):
         runner_res = execute_blackbox_target(target_bin, crash_file)
         assert runner_res["crashed"] is True, "Target biner tertutup harus terdeteksi crash"
+
+# 18. Test Lab 19 Cross-Architecture Firmware Emulation Mutator & Harness
+def test_firmware_emulator_and_mutator():
+    import importlib.util
+    mut_path = "fuzz_lab19_unicorn_firmware/ai_mutator_firmware.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 19 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_firmware", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(999)
+    sample = bytearray(b"\x00" * 75)
+    res = mut.fuzz(sample, None, 128)
+
+    assert res[:4] == b"FIRM", "Firmware mutator harus mengunci Header FIRM"
+    assert struct.unpack("<I", res[4:8])[0] == 0x00010002, "Device ID 0x00010002 harus terkunci"
+    mut.deinit()
+
+    # Test Micro-Emulator Harness
+    from fuzz_lab19_unicorn_firmware.firmware_emulator import FirmwareMicroEmulator
+    target_bin = "fuzz_lab19_unicorn_firmware/firmware_target_fuzz"
+    if os.path.exists(target_bin):
+        emu = FirmwareMicroEmulator(target_bin)
+        assert emu.read_mmio(0x40000000) == 0x01, "MMIO Status Register harus READY (0x01)"
+        
+        # Test Payload Overflow Execution
+        crash_pkt = struct.pack("<4sIBH64s", b"FIRM", 0x00010002, 0xEE, 32, b"A" * 64)
+        run_res = emu.execute_packet(crash_pkt)
+        assert run_res["crashed"] is True, "Overflow paket firmware harus memicu crash"

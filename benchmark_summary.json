@@ -22,6 +22,17 @@
     "stability": "100.00%"
   },
   {
+    "lab": "fuzz_lab19_unicorn_firmware",
+    "target": "default",
+    "runtime_seconds": "2",
+    "total_execs": "368",
+    "exec_speed": "141.16",
+    "corpus_count": 2,
+    "unique_crashes": 1,
+    "map_density": "26.32%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab5_realworld_cjson",
     "target": "default",
     "runtime_seconds": "3141",
