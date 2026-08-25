@@ -55,6 +55,17 @@
     "stability": "100.00%"
   },
   {
+    "lab": "fuzz_lab17_kernel_kcov",
+    "target": "default",
+    "runtime_seconds": "4",
+    "total_execs": "405",
+    "exec_speed": "98.88",
+    "corpus_count": 3,
+    "unique_crashes": 1,
+    "map_density": "28.12%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab1",
     "target": "default",
     "runtime_seconds": "417",

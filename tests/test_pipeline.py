@@ -277,3 +277,23 @@ def test_fuzzer_cli_orchestrator():
     res_bench = subprocess.run([cli_path, "benchmark"], capture_output=True, text=True)
     assert res_bench.returncode == 0
     assert "Statistical significance" in res_bench.stdout
+
+# 16. Test Lab 17 Kernel IOCTL Structure Mutator
+def test_kernel_ioctl_mutator():
+    import importlib.util
+    mut_path = "fuzz_lab17_kernel_kcov/ai_mutator_ioctl.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 17 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_ioctl", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(77)
+    sample = bytearray(b"\x88\x01\x04\x00" + b"\x00" * 64)
+    res = mut.fuzz(sample, None, 128)
+
+    assert len(res) == 68, "Ukuran paket IOCTL harus 68 bytes"
+    assert res[0] == 0x88, "Magic Driver harus selalu 0x88"
+    assert res[1] in [0x01, 0x02, 0x03], "Command ID harus valid"
+    mut.deinit()
