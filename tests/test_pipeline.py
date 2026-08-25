@@ -297,3 +297,30 @@ def test_kernel_ioctl_mutator():
     assert res[0] == 0x88, "Magic Driver harus selalu 0x88"
     assert res[1] in [0x01, 0x02, 0x03], "Command ID harus valid"
     mut.deinit()
+
+# 17. Test Lab 18 QEMU Black-Box Binary Fuzzing Mutator & Runner
+def test_blackbox_qemu_mutator_and_runner():
+    import importlib.util
+    mut_path = "fuzz_lab18_qemu_binary_only/ai_mutator_blackbox.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 18 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_blackbox", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(42)
+    sample = bytearray(b"\x00" * 48)
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"BIN$", "Black-box mutator harus mengunci Header BIN$"
+    assert struct.unpack("<I", res[4:8])[0] == 0x4B4C4142, "Secret Key 0x4B4C4142 harus terkunci"
+    mut.deinit()
+
+    # Test Runner
+    from fuzz_lab18_qemu_binary_only.qemu_runner import execute_blackbox_target
+    target_bin = "fuzz_lab18_qemu_binary_only/target_blackbox_bin"
+    crash_file = "fuzz_lab18_qemu_binary_only/in/crash_blackbox.bin"
+    if os.path.exists(target_bin) and os.path.exists(crash_file):
+        runner_res = execute_blackbox_target(target_bin, crash_file)
+        assert runner_res["crashed"] is True, "Target biner tertutup harus terdeteksi crash"
