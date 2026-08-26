@@ -1,0 +1,6 @@
+--- vuln_target.c (Original)
++++ vuln_target.c (Patched)
+@@ -8,3 +8,4 @@
+-    memcpy(dest, src, len);
++    if (len > sizeof(dest)) len = sizeof(dest);
++    memcpy(dest, src, len);

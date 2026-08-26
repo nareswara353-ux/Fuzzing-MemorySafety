@@ -438,3 +438,18 @@ def test_distributed_cluster_engine():
     res = mut.fuzz(bytearray(b"\x00" * 74), None, 128)
     assert struct.unpack("<I", res[:4])[0] == 0x54534944, "Magic DIST header harus terkunci"
     mut.deinit()
+
+# 22. Test Lab 23 Automated Program Repair & Patch Verification
+def test_auto_program_repair():
+    from tools.auto_patcher import generate_and_verify_patch
+
+    src = "fuzz_lab23_auto_patching/vuln_target.c"
+    poc = "fuzz_lab23_auto_patching/in/crash_poc.bin"
+    valid = "fuzz_lab23_auto_patching/in/seed_valid.bin"
+
+    if os.path.exists(src) and os.path.exists(poc) and os.path.exists(valid):
+        res = generate_and_verify_patch(src, poc, valid)
+        assert res["poc_vulnerability_fixed"] is True, "Patch harus memperbaiki crash PoC"
+        assert res["no_regression_confirmed"] is True, "Patch tidak boleh merusak seed valid"
+        assert res["patch_file"] is not None
+        assert os.path.exists(res["patch_file"])
