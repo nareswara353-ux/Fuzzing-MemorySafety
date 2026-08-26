@@ -33,7 +33,7 @@ jobs:
             llvm clang make gcc g++ python3-matplotlib python3-pytest || true
           pip install pytest z3-solver
 
-      - name: Compile Java Targets
+      - name: Compile Java & JNI Targets
         run: |
           if [ -f "fuzz_lab24_java_jvm_harness/TargetParser.java" ]; then
             javac fuzz_lab24_java_jvm_harness/TargetParser.java
@@ -41,14 +41,18 @@ jobs:
           if [ -f "fuzz_lab25_java_deserialization/InsecureDeserializer.java" ]; then
             javac fuzz_lab25_java_deserialization/InsecureDeserializer.java
           fi
+          if [ -f "fuzz_lab26_jni_boundary/NativeBridge.java" ]; then
+            cd fuzz_lab26_jni_boundary
+            javac NativeBridge.java
+            gcc -shared -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" native_lib.c -o libnative_engine.so
+            cd ..
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
           python3 tools/generate_dashboard.py
           test -f report_dashboard.html
-          echo "[+] Dashboard verification passed."
 
       - name: Execute Automated Regression Test Suite (pytest)
         run: |
           pytest -v tests/
-          echo "[+] All automated unit and integration tests passed."

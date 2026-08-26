@@ -517,3 +517,31 @@ def test_java_deserialization_fuzzing():
     if os.path.exists(os.path.join(class_dir, "InsecureDeserializer.class")) and os.path.exists(crash_file):
         res_exec = run_deserialization_test(class_dir, crash_file)
         assert res_exec["violation_detected"] is True, "Oracle harus menangkap insecure gadget invocation"
+
+def test_jni_boundary_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab26_jni_boundary.jni_runner import run_jni_target
+
+    mut_path = "fuzz_lab26_jni_boundary/ai_mutator_jni.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 26 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_jni", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(1337)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x494e4a24
+    assert len(res) >= 8
+    mut.deinit()
+
+    class_dir = "fuzz_lab26_jni_boundary"
+    crash_file = "fuzz_lab26_jni_boundary/in/crash_jni.bin"
+    has_dylib = os.path.exists(os.path.join(class_dir, "libnative_engine.so")) or os.path.exists(os.path.join(class_dir, "libnative_engine.dylib"))
+    if os.path.exists(os.path.join(class_dir, "NativeBridge.class")) and has_dylib and os.path.exists(crash_file):
+        res_exec = run_jni_target(class_dir, crash_file)
+        assert res_exec["crashed"] is True
