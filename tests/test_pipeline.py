@@ -571,3 +571,28 @@ def test_java_spel_injection_fuzzing():
     if os.path.exists(os.path.join(class_dir, "SpelEvaluator.class")) and os.path.exists(crash_file):
         res_exec = run_spel_target(class_dir, crash_file)
         assert res_exec["violation_detected"] is True
+
+def test_java_xxe_fuzzing():
+    import importlib.util
+    from fuzz_lab28_java_xxe_bomb.xxe_runner import run_xxe_target
+
+    mut_path = "fuzz_lab28_java_xxe_bomb/ai_mutator_xxe.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 28 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_xxe", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(42)
+    sample = bytearray(b"<root></root>")
+    res = mut.fuzz(sample, None, 512)
+
+    assert b"<?xml" in res or b"<" in res
+    mut.deinit()
+
+    class_dir = "fuzz_lab28_java_xxe_bomb"
+    crash_file = "fuzz_lab28_java_xxe_bomb/in/crash_xxe.bin"
+    if os.path.exists(os.path.join(class_dir, "XxeTargetParser.class")) and os.path.exists(crash_file):
+        res_exec = run_xxe_target(class_dir, crash_file)
+        assert res_exec["violation_detected"] is True

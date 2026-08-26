@@ -50,6 +50,9 @@ jobs:
           if [ -f "fuzz_lab27_java_spel_ognl/SpelEvaluator.java" ]; then
             javac fuzz_lab27_java_spel_ognl/SpelEvaluator.java
           fi
+          if [ -f "fuzz_lab28_java_xxe_bomb/XxeTargetParser.java" ]; then
+            javac fuzz_lab28_java_xxe_bomb/XxeTargetParser.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
