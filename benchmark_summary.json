@@ -209,6 +209,17 @@
     "stability": "100.00%"
   },
   {
+    "lab": "fuzz_lab22_distributed_cluster",
+    "target": "default",
+    "runtime_seconds": "1",
+    "total_execs": "231",
+    "exec_speed": "122.61",
+    "corpus_count": 2,
+    "unique_crashes": 1,
+    "map_density": "12.50%",
+    "stability": "100.00%"
+  },
+  {
     "lab": "fuzz_lab10_differential",
     "target": "default",
     "runtime_seconds": "9",

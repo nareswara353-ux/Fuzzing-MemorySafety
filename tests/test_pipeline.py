@@ -402,3 +402,39 @@ def test_wasm_bytecode_mutator():
     # Validasi Type Section ID (0x01)
     assert res[8] == 0x01
     mut.deinit()
+
+# 21. Test Lab 22 Distributed Cloud Fuzzing Coordinator & Mutator
+def test_distributed_cluster_engine():
+    import importlib.util
+    import tempfile
+    from fuzz_lab22_distributed_cluster.cluster_sync_engine import DistributedCorpusCoordinator, synthesize_cluster_seed
+
+    with tempfile.TemporaryDirectory() as shared_dir, tempfile.TemporaryDirectory() as worker_in:
+        coord = DistributedCorpusCoordinator(shared_pool_dir=shared_dir)
+        
+        seed_data = synthesize_cluster_seed(1, 100, 0xCC, b"CLUSTER_SYNC_ALL")
+        assert len(seed_data) == 74, "Ukuran paket cluster harus 74 bytes"
+        
+        # Test 1: Broadcast seed baru
+        added, path = coord.broadcast_seed(1, seed_data)
+        assert added is True
+        assert os.path.exists(path)
+
+        # Test 2: Deduplikasi seed kembar
+        dup_added, _ = coord.broadcast_seed(2, seed_data)
+        assert dup_added is False, "Seed yang identik harus ter-deduplikasi"
+
+        # Test 3: Sinkronisasi ke worker inbox
+        synced = coord.sync_worker_inbox(worker_in)
+        assert synced == 1, "Harus menyinkronkan 1 seed unik ke antrean worker"
+
+    # Test Mutator
+    mut_path = "fuzz_lab22_distributed_cluster/ai_mutator_cluster.py"
+    spec = importlib.util.spec_from_file_location("ai_mutator_cluster", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(777)
+    res = mut.fuzz(bytearray(b"\x00" * 74), None, 128)
+    assert struct.unpack("<I", res[:4])[0] == 0x54534944, "Magic DIST header harus terkunci"
+    mut.deinit()
