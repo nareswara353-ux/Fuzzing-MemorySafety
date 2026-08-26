@@ -674,3 +674,30 @@ def test_jvm_bytecode_agent_coverage():
         res_exec = run_agent_target(class_dir, crash_file)
         assert res_exec["crashed"] is True
         assert res_exec["branches_hit"] > 0
+
+def test_java_concurrency_deadlock_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab32_java_concurrency_deadlock.concurrency_runner import run_concurrency_target
+
+    mut_path = "fuzz_lab32_java_concurrency_deadlock/ai_mutator_concurrency.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 32 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_concurrency", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(3232)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x54485244
+    assert len(res) >= 8
+    mut.deinit()
+
+    class_dir = "fuzz_lab32_java_concurrency_deadlock"
+    crash_file = "fuzz_lab32_java_concurrency_deadlock/in/crash_thread.bin"
+    if os.path.exists(os.path.join(class_dir, "ConcurrentService.class")) and os.path.exists(crash_file):
+        res_exec = run_concurrency_target(class_dir, crash_file)
+        assert res_exec["violation_detected"] is True

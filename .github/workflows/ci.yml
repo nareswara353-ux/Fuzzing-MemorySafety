@@ -62,6 +62,9 @@ jobs:
           if [ -f "fuzz_lab31_jvm_bytecode_agent/CoverageAgent.java" ]; then
             javac fuzz_lab31_jvm_bytecode_agent/CoverageAgent.java fuzz_lab31_jvm_bytecode_agent/TargetApp.java
           fi
+          if [ -f "fuzz_lab32_java_concurrency_deadlock/ConcurrentService.java" ]; then
+            javac fuzz_lab32_java_concurrency_deadlock/ConcurrentService.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
