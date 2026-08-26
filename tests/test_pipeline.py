@@ -726,3 +726,29 @@ def test_java_jwt_crypto_bypass_fuzzing():
     if os.path.exists(os.path.join(class_dir, "JwtAuthService.class")) and os.path.exists(crash_file):
         res_exec = run_jwt_target(class_dir, crash_file)
         assert res_exec["violation_detected"] is True
+
+def test_java_json_differential_fuzzing():
+    import importlib.util
+    from fuzz_lab34_java_json_diff.diff_json_runner import run_json_diff_target
+
+    mut_path = "fuzz_lab34_java_json_diff/ai_mutator_json.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 34 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_json", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(3434)
+    sample = bytearray(b'{"user":"test"}')
+    res = mut.fuzz(sample, None, 128)
+
+    assert len(res) > 0
+    assert b"{" in res and b"}" in res
+    mut.deinit()
+
+    class_dir = "fuzz_lab34_java_json_diff"
+    crash_file = "fuzz_lab34_java_json_diff/in/crash_diff.bin"
+    if os.path.exists(os.path.join(class_dir, "JsonDifferentialOracle.class")) and os.path.exists(crash_file):
+        res_exec = run_json_diff_target(class_dir, crash_file)
+        assert res_exec["discrepancy_detected"] is True

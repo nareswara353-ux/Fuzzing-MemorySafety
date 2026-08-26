@@ -68,6 +68,9 @@ jobs:
           if [ -f "fuzz_lab33_java_jwt_crypto/JwtAuthService.java" ]; then
             javac fuzz_lab33_java_jwt_crypto/JwtAuthService.java
           fi
+          if [ -f "fuzz_lab34_java_json_diff/JsonDifferentialOracle.java" ]; then
+            javac fuzz_lab34_java_json_diff/JsonDifferentialOracle.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
