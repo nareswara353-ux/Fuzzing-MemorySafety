@@ -483,3 +483,37 @@ def test_java_jvm_fuzzing_harness():
     if os.path.exists(os.path.join(class_dir, "TargetParser.class")) and os.path.exists(crash_file):
         res_exec = execute_java_target(class_dir, "TargetParser", crash_file)
         assert res_exec["crashed"] is True, "Runner harus mendeteksi uncaught JVM exception"
+
+# 24. Test Lab 25 Java Insecure Deserialization Mutator & Oracle
+def test_java_deserialization_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab25_java_deserialization.deserial_runner import run_deserialization_test
+
+    # Test Mutator
+    mut_path = "fuzz_lab25_java_deserialization/ai_mutator_deserial.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 25 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_deserial", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(99)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 128)
+
+    # Validasi Java Serialization Header (Big-Endian 0xACED 0x0005)
+    magic, version, tc_obj, tc_class = struct.unpack(">HHBB", res[:6])
+    assert magic == 0xACED, "Stream magic harus 0xACED"
+    assert version == 0x0005, "Stream version harus 0x0005"
+    assert tc_obj == 0x73, "TC_OBJECT identifier mismatch"
+    assert tc_class == 0x72, "TC_CLASSDESC identifier mismatch"
+    mut.deinit()
+
+    # Test Execution Runner terhadap InsecureDeserializer
+    class_dir = "fuzz_lab25_java_deserialization"
+    crash_file = "fuzz_lab25_java_deserialization/in/crash_gadget.bin"
+    if os.path.exists(os.path.join(class_dir, "InsecureDeserializer.class")) and os.path.exists(crash_file):
+        res_exec = run_deserialization_test(class_dir, crash_file)
+        assert res_exec["violation_detected"] is True, "Oracle harus menangkap insecure gadget invocation"

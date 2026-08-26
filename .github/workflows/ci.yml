@@ -38,6 +38,9 @@ jobs:
           if [ -f "fuzz_lab24_java_jvm_harness/TargetParser.java" ]; then
             javac fuzz_lab24_java_jvm_harness/TargetParser.java
           fi
+          if [ -f "fuzz_lab25_java_deserialization/InsecureDeserializer.java" ]; then
+            javac fuzz_lab25_java_deserialization/InsecureDeserializer.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
