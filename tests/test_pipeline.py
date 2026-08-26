@@ -646,3 +646,31 @@ def test_java_sql_injection_fuzzing():
     if os.path.exists(os.path.join(class_dir, "SqlTargetRepository.class")) and os.path.exists(crash_file):
         res_exec = run_sql_target(class_dir, crash_file)
         assert res_exec["violation_detected"] is True
+
+def test_jvm_bytecode_agent_coverage():
+    import importlib.util
+    import struct
+    from fuzz_lab31_jvm_bytecode_agent.coverage_runner import run_agent_target
+
+    mut_path = "fuzz_lab31_jvm_bytecode_agent/ai_mutator_agent.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 31 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_agent", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(3131)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x41474e54
+    assert len(res) >= 8
+    mut.deinit()
+
+    class_dir = "fuzz_lab31_jvm_bytecode_agent"
+    crash_file = "fuzz_lab31_jvm_bytecode_agent/in/crash_agent.bin"
+    if os.path.exists(os.path.join(class_dir, "TargetApp.class")) and os.path.exists(crash_file):
+        res_exec = run_agent_target(class_dir, crash_file)
+        assert res_exec["crashed"] is True
+        assert res_exec["branches_hit"] > 0

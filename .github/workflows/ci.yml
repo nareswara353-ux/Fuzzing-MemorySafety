@@ -59,6 +59,9 @@ jobs:
           if [ -f "fuzz_lab30_java_sql_injection/SqlTargetRepository.java" ]; then
             javac fuzz_lab30_java_sql_injection/SqlTargetRepository.java
           fi
+          if [ -f "fuzz_lab31_jvm_bytecode_agent/CoverageAgent.java" ]; then
+            javac fuzz_lab31_jvm_bytecode_agent/CoverageAgent.java fuzz_lab31_jvm_bytecode_agent/TargetApp.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
