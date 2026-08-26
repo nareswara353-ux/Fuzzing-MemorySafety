@@ -1,0 +1,5 @@
+--- VulnArrayHandler.java (Original)
++++ VulnArrayHandler.java (Patched)
+@@ -7,2 +7,2 @@
+-        int limit = data.length;
++        int limit = Math.min(data.length, buffer.length);

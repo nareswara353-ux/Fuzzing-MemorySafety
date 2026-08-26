@@ -752,3 +752,17 @@ def test_java_json_differential_fuzzing():
     if os.path.exists(os.path.join(class_dir, "JsonDifferentialOracle.class")) and os.path.exists(crash_file):
         res_exec = run_json_diff_target(class_dir, crash_file)
         assert res_exec["discrepancy_detected"] is True
+
+def test_java_auto_program_repair():
+    from tools.java_auto_patcher import patch_and_verify_java
+
+    src = "fuzz_lab35_java_auto_patching/VulnArrayHandler.java"
+    crash = "fuzz_lab35_java_auto_patching/in/crash_poc.bin"
+    seed = "fuzz_lab35_java_auto_patching/in/seed_valid.bin"
+
+    if os.path.exists(src) and os.path.exists(crash) and os.path.exists(seed):
+        res = patch_and_verify_java(src, crash, seed)
+        assert res["crash_fixed"] is True
+        assert res["no_regression"] is True
+        assert res["patch_file"] is not None
+        assert os.path.exists(res["patch_file"])

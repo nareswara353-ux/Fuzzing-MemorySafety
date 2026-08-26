@@ -71,6 +71,9 @@ jobs:
           if [ -f "fuzz_lab34_java_json_diff/JsonDifferentialOracle.java" ]; then
             javac fuzz_lab34_java_json_diff/JsonDifferentialOracle.java
           fi
+          if [ -f "fuzz_lab35_java_auto_patching/VulnArrayHandler.java" ]; then
+            javac fuzz_lab35_java_auto_patching/VulnArrayHandler.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
