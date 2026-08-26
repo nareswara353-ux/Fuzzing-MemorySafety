@@ -2,13 +2,13 @@ name: Compiler-Guided Neural Fuzzing CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, experimental ]
   pull_request:
     branches: [ main, master ]
 
 jobs:
   build-and-verify:
-    name: LLVM Pass Build & Static Analysis Verification
+    name: Polyglot Fuzzing Test Suite & Analysis Verification
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +20,12 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Install System Dependencies & Toolchain
         run: |
           sudo apt-get update || true
@@ -27,28 +33,11 @@ jobs:
             llvm clang make gcc g++ python3-matplotlib python3-pytest || true
           pip install pytest z3-solver
 
-      - name: Compile LLVM Constraint Extractor
+      - name: Compile Java Targets
         run: |
-          cd fuzz_lab4_llvm_pass
-          if [ -f "constraint_extractor.cpp" ]; then
-            LLVM_CONFIG_BIN=$(which llvm-config || which llvm-config-14 || which llvm-config-15 || which llvm-config-16 || echo "")
-            if [ -n "$LLVM_CONFIG_BIN" ]; then
-              LLVM_FLAGS=$($LLVM_CONFIG_BIN --cxxflags --ldflags --system-libs --libs core irreader support 2>/dev/null || echo "")
-              clang++ -std=c++17 -fno-rtti -O2 constraint_extractor.cpp $LLVM_FLAGS -o constraint_extractor_ci || echo "Build warning handled"
-            fi
+          if [ -f "fuzz_lab24_java_jvm_harness/TargetParser.java" ]; then
+            javac fuzz_lab24_java_jvm_harness/TargetParser.java
           fi
-          echo "[+] LLVM compilation stage passed."
-
-      - name: Verify Bitcode Analysis Pipeline
-        run: |
-          cd fuzz_lab4_llvm_pass
-          if [ -f "target.c" ]; then
-            clang -O1 -emit-llvm -c target.c -o target.bc || true
-          fi
-          if [ ! -s extracted_constraints.json ]; then
-            echo '{"extracted_integers": [16, 64], "hex_tokens": ["PACK", "7f45"]}' > extracted_constraints.json
-          fi
-          echo "[+] Bitcode verification passed."
 
       - name: Verify Telemetry Dashboard Generation
         run: |

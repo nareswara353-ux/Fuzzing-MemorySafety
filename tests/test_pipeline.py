@@ -453,3 +453,33 @@ def test_auto_program_repair():
         assert res["no_regression_confirmed"] is True, "Patch tidak boleh merusak seed valid"
         assert res["patch_file"] is not None
         assert os.path.exists(res["patch_file"])
+
+# 23. Test Lab 24 Java/JVM Execution Harness & Structure Mutator
+def test_java_jvm_fuzzing_harness():
+    import importlib.util
+    import struct
+    from fuzz_lab24_java_jvm_harness.java_fuzz_runner import execute_java_target
+
+    # Test Mutator Logic
+    mut_path = "fuzz_lab24_java_jvm_harness/ai_mutator_java.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 24 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_java", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(42)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x4156414A, "Magic JAVA header harus terkunci"
+    assert len(res) >= 8
+    mut.deinit()
+
+    # Test JVM Execution Runner jika bytecode TargetParser.class ada
+    class_dir = "fuzz_lab24_java_jvm_harness"
+    crash_file = "fuzz_lab24_java_jvm_harness/in/crash_jvm.bin"
+    if os.path.exists(os.path.join(class_dir, "TargetParser.class")) and os.path.exists(crash_file):
+        res_exec = execute_java_target(class_dir, "TargetParser", crash_file)
+        assert res_exec["crashed"] is True, "Runner harus mendeteksi uncaught JVM exception"
