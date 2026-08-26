@@ -545,3 +545,29 @@ def test_jni_boundary_fuzzing():
     if os.path.exists(os.path.join(class_dir, "NativeBridge.class")) and has_dylib and os.path.exists(crash_file):
         res_exec = run_jni_target(class_dir, crash_file)
         assert res_exec["crashed"] is True
+
+def test_java_spel_injection_fuzzing():
+    import importlib.util
+    from fuzz_lab27_java_spel_ognl.spel_runner import run_spel_target
+
+    mut_path = "fuzz_lab27_java_spel_ognl/ai_mutator_spel.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 27 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_spel", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(2024)
+    sample = bytearray(b"#{1+1}")
+    res = mut.fuzz(sample, None, 128)
+
+    assert res.startswith(b"#{") or res.startswith(b"${")
+    assert res.endswith(b"}")
+    mut.deinit()
+
+    class_dir = "fuzz_lab27_java_spel_ognl"
+    crash_file = "fuzz_lab27_java_spel_ognl/in/crash_spel.bin"
+    if os.path.exists(os.path.join(class_dir, "SpelEvaluator.class")) and os.path.exists(crash_file):
+        res_exec = run_spel_target(class_dir, crash_file)
+        assert res_exec["violation_detected"] is True

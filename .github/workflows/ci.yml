@@ -47,6 +47,9 @@ jobs:
             gcc -shared -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" native_lib.c -o libnative_engine.so
             cd ..
           fi
+          if [ -f "fuzz_lab27_java_spel_ognl/SpelEvaluator.java" ]; then
+            javac fuzz_lab27_java_spel_ognl/SpelEvaluator.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
