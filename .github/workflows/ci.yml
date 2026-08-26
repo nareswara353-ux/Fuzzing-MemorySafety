@@ -65,6 +65,9 @@ jobs:
           if [ -f "fuzz_lab32_java_concurrency_deadlock/ConcurrentService.java" ]; then
             javac fuzz_lab32_java_concurrency_deadlock/ConcurrentService.java
           fi
+          if [ -f "fuzz_lab33_java_jwt_crypto/JwtAuthService.java" ]; then
+            javac fuzz_lab33_java_jwt_crypto/JwtAuthService.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |

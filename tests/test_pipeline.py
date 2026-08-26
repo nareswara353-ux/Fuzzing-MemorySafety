@@ -701,3 +701,28 @@ def test_java_concurrency_deadlock_fuzzing():
     if os.path.exists(os.path.join(class_dir, "ConcurrentService.class")) and os.path.exists(crash_file):
         res_exec = run_concurrency_target(class_dir, crash_file)
         assert res_exec["violation_detected"] is True
+
+def test_java_jwt_crypto_bypass_fuzzing():
+    import importlib.util
+    from fuzz_lab33_java_jwt_crypto.jwt_runner import run_jwt_target
+
+    mut_path = "fuzz_lab33_java_jwt_crypto/ai_mutator_jwt.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 33 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_jwt", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(3333)
+    sample = bytearray(b"header.payload.sig")
+    res = mut.fuzz(sample, None, 256)
+
+    assert b"." in res
+    mut.deinit()
+
+    class_dir = "fuzz_lab33_java_jwt_crypto"
+    crash_file = "fuzz_lab33_java_jwt_crypto/in/crash_jwt.bin"
+    if os.path.exists(os.path.join(class_dir, "JwtAuthService.class")) and os.path.exists(crash_file):
+        res_exec = run_jwt_target(class_dir, crash_file)
+        assert res_exec["violation_detected"] is True
