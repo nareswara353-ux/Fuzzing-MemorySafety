@@ -621,3 +621,28 @@ def test_java_redos_fuzzing():
     if os.path.exists(os.path.join(class_dir, "RedosValidator.class")) and os.path.exists(crash_file):
         res_exec = run_redos_target(class_dir, crash_file)
         assert res_exec["violation_detected"] is True
+
+def test_java_sql_injection_fuzzing():
+    import importlib.util
+    from fuzz_lab30_java_sql_injection.sql_runner import run_sql_target
+
+    mut_path = "fuzz_lab30_java_sql_injection/ai_mutator_sql.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 30 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_sql", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(303)
+    sample = bytearray(b"guest")
+    res = mut.fuzz(sample, None, 128)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    class_dir = "fuzz_lab30_java_sql_injection"
+    crash_file = "fuzz_lab30_java_sql_injection/in/crash_sql.bin"
+    if os.path.exists(os.path.join(class_dir, "SqlTargetRepository.class")) and os.path.exists(crash_file):
+        res_exec = run_sql_target(class_dir, crash_file)
+        assert res_exec["violation_detected"] is True

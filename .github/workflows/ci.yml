@@ -56,6 +56,9 @@ jobs:
           if [ -f "fuzz_lab29_java_redos/RedosValidator.java" ]; then
             javac fuzz_lab29_java_redos/RedosValidator.java
           fi
+          if [ -f "fuzz_lab30_java_sql_injection/SqlTargetRepository.java" ]; then
+            javac fuzz_lab30_java_sql_injection/SqlTargetRepository.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
