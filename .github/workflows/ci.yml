@@ -53,6 +53,9 @@ jobs:
           if [ -f "fuzz_lab28_java_xxe_bomb/XxeTargetParser.java" ]; then
             javac fuzz_lab28_java_xxe_bomb/XxeTargetParser.java
           fi
+          if [ -f "fuzz_lab29_java_redos/RedosValidator.java" ]; then
+            javac fuzz_lab29_java_redos/RedosValidator.java
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |

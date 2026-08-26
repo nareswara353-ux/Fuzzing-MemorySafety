@@ -596,3 +596,28 @@ def test_java_xxe_fuzzing():
     if os.path.exists(os.path.join(class_dir, "XxeTargetParser.class")) and os.path.exists(crash_file):
         res_exec = run_xxe_target(class_dir, crash_file)
         assert res_exec["violation_detected"] is True
+
+def test_java_redos_fuzzing():
+    import importlib.util
+    from fuzz_lab29_java_redos.redos_runner import run_redos_target
+
+    mut_path = "fuzz_lab29_java_redos/ai_mutator_redos.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 29 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_redos", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(101)
+    sample = bytearray(b"admin@example")
+    res = mut.fuzz(sample, None, 128)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    class_dir = "fuzz_lab29_java_redos"
+    crash_file = "fuzz_lab29_java_redos/in/crash_redos.bin"
+    if os.path.exists(os.path.join(class_dir, "RedosValidator.class")) and os.path.exists(crash_file):
+        res_exec = run_redos_target(class_dir, crash_file)
+        assert res_exec["violation_detected"] is True
