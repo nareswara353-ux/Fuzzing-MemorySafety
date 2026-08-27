@@ -874,3 +874,30 @@ def test_rust_serde_zerocopy_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_zerocopy_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_rust_concurrency_poisoning_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab40_rust_concurrency_poisoning.poison_runner import run_poison_target
+
+    mut_path = "fuzz_lab40_rust_concurrency_poisoning/ai_mutator_poison.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 40 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_poison", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(4040)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x504F4953
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab40_rust_concurrency_poisoning/concurrency_target_bin"
+    crash_file = "fuzz_lab40_rust_concurrency_poisoning/in/crash_poison.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_poison_target(bin_path, crash_file)
+        assert res_exec["panicked"] is True
