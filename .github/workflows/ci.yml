@@ -99,6 +99,9 @@ jobs:
           if [ -f "fuzz_lab41_rust_async_starvation/async_target.rs" ]; then
             rustc -g -O fuzz_lab41_rust_async_starvation/async_target.rs -o fuzz_lab41_rust_async_starvation/async_target_bin
           fi
+          if [ -f "fuzz_lab42_rust_asan_lsan/asan_target.rs" ]; then
+            rustc -g -O fuzz_lab42_rust_asan_lsan/asan_target.rs -o fuzz_lab42_rust_asan_lsan/asan_target_bin
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
