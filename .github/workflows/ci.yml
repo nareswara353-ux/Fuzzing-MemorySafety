@@ -126,6 +126,11 @@ jobs:
             go build -o target_race_bin .
             cd ..
           fi
+          if [ -f "fuzz_lab48_golang_nil_deref/nil_target.go" ]; then
+            cd fuzz_lab48_golang_nil_deref
+            go build -o target_nil_bin .
+            cd ..
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
