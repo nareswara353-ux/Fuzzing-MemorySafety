@@ -19,7 +19,7 @@ fn process_bytes(data: &[u8]) {
     if cmd == 0x01 {
         println!("[*] Safe Rust ping command processed");
     } else if cmd == 0xAA {
-        if len >= 16 && data.len() >= 7 + len {
+        if len >= 14 && data.len() >= 7 + len {
             let slice = &data[7..7 + len];
             if slice.starts_with(b"UNSAFE_EXPLOIT") {
                 eprintln!("[!] RUST UNSAFE MEMORY CORRUPTION HIT");
