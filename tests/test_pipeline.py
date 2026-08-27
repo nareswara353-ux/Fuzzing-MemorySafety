@@ -955,3 +955,30 @@ def test_rust_asan_lsan_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_asan_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_rust_macro_ast_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab43_rust_macro_ast.macro_runner import run_macro_target
+
+    mut_path = "fuzz_lab43_rust_macro_ast/ai_mutator_macro.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 43 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_macro", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(4343)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x4D414352
+    assert len(res) >= 6
+    mut.deinit()
+
+    bin_path = "fuzz_lab43_rust_macro_ast/macro_target_bin"
+    crash_file = "fuzz_lab43_rust_macro_ast/in/crash_macro.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_macro_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
