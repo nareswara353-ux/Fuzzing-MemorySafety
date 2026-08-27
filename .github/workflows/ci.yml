@@ -90,6 +90,9 @@ jobs:
             rustc -g -L . -l c_lib main.rs -o rust_ffi_bin
             cd ..
           fi
+          if [ -f "fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target.rs" ]; then
+            rustc -g -O fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target.rs -o fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target_bin
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |

@@ -847,3 +847,30 @@ def test_rust_ffi_boundary_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_ffi_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_rust_serde_zerocopy_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab39_rust_serde_zerocopy.zerocopy_runner import run_zerocopy_target
+
+    mut_path = "fuzz_lab39_rust_serde_zerocopy/ai_mutator_zerocopy.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 39 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_zerocopy", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(3939)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x5A435059
+    assert len(res) >= 8
+    mut.deinit()
+
+    bin_path = "fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target_bin"
+    crash_file = "fuzz_lab39_rust_serde_zerocopy/in/crash_zerocopy.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_zerocopy_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
