@@ -23,15 +23,7 @@ fn process_bytes(data: &[u8]) {
             let slice = &data[7..7 + len];
             if slice.starts_with(b"UNSAFE_EXPLOIT") {
                 eprintln!("[!] RUST UNSAFE MEMORY CORRUPTION HIT");
-                unsafe {
-                    let mut heap_buf: Vec<u8> = Vec::with_capacity(16);
-                    let ptr = heap_buf.as_mut_ptr();
-                    for i in 0..128 {
-                        *ptr.add(i) = 0xFF;
-                    }
-                    let null_ptr: *mut i32 = std::ptr::null_mut();
-                    *null_ptr = 1337;
-                }
+                process::abort();
             }
         }
     }
