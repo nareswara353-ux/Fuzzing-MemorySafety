@@ -820,3 +820,30 @@ def test_rust_integer_overflow_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_overflow_target(bin_path, crash_file)
         assert res_exec["panicked"] is True
+
+def test_rust_ffi_boundary_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab38_rust_ffi_boundary.ffi_runner import run_ffi_target
+
+    mut_path = "fuzz_lab38_rust_ffi_boundary/ai_mutator_ffi.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 38 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_ffi", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(3838)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x46464924
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab38_rust_ffi_boundary/rust_ffi_bin"
+    crash_file = "fuzz_lab38_rust_ffi_boundary/in/crash_ffi.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_ffi_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
