@@ -1023,3 +1023,30 @@ def test_rust_auto_program_repair():
         assert res["no_regression"] is True
         assert res["patch_file"] is not None
         assert os.path.exists(res["patch_file"])
+
+def test_golang_native_engine_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab46_golang_native_engine.go_runner import run_go_target
+
+    mut_path = "fuzz_lab46_golang_native_engine/ai_mutator_go.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 46 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_go", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(4646)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x474F4C47
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab46_golang_native_engine/target_go_bin"
+    crash_file = "fuzz_lab46_golang_native_engine/in/crash_go.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_go_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
