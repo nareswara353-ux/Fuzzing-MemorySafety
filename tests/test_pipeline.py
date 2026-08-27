@@ -793,3 +793,30 @@ def test_rust_memory_safety_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_rust_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_rust_integer_overflow_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab37_rust_integer_overflow.overflow_runner import run_overflow_target
+
+    mut_path = "fuzz_lab37_rust_integer_overflow/ai_mutator_overflow.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 37 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_overflow", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(3737)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x4F56464C
+    assert len(res) >= 11
+    mut.deinit()
+
+    bin_path = "fuzz_lab37_rust_integer_overflow/arithmetic_target_bin"
+    crash_file = "fuzz_lab37_rust_integer_overflow/in/crash_overflow.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_overflow_target(bin_path, crash_file)
+        assert res_exec["panicked"] is True

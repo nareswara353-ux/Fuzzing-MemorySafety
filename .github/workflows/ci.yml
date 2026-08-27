@@ -80,6 +80,9 @@ jobs:
           if [ -f "fuzz_lab36_rust_memory_safety/target.rs" ]; then
             rustc -g -O fuzz_lab36_rust_memory_safety/target.rs -o fuzz_lab36_rust_memory_safety/target_rust_bin
           fi
+          if [ -f "fuzz_lab37_rust_integer_overflow/arithmetic_target.rs" ]; then
+            rustc -g -C overflow-checks=on fuzz_lab37_rust_integer_overflow/arithmetic_target.rs -o fuzz_lab37_rust_integer_overflow/arithmetic_target_bin
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
