@@ -108,6 +108,9 @@ jobs:
           if [ -f "fuzz_lab44_rust_crypto_timing/crypto_target.rs" ]; then
             rustc -g -O fuzz_lab44_rust_crypto_timing/crypto_target.rs -o fuzz_lab44_rust_crypto_timing/crypto_target_bin
           fi
+          if [ -f "fuzz_lab45_rust_auto_patcher/vuln_target.rs" ]; then
+            rustc -g -O fuzz_lab45_rust_auto_patcher/vuln_target.rs -o fuzz_lab45_rust_auto_patcher/vuln_target_bin
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
