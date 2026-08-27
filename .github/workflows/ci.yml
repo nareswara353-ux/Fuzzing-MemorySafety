@@ -96,6 +96,9 @@ jobs:
           if [ -f "fuzz_lab40_rust_concurrency_poisoning/concurrency_target.rs" ]; then
             rustc -g -O fuzz_lab40_rust_concurrency_poisoning/concurrency_target.rs -o fuzz_lab40_rust_concurrency_poisoning/concurrency_target_bin
           fi
+          if [ -f "fuzz_lab41_rust_async_starvation/async_target.rs" ]; then
+            rustc -g -O fuzz_lab41_rust_async_starvation/async_target.rs -o fuzz_lab41_rust_async_starvation/async_target_bin
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
