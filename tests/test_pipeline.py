@@ -901,3 +901,30 @@ def test_rust_concurrency_poisoning_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_poison_target(bin_path, crash_file)
         assert res_exec["panicked"] is True
+
+def test_rust_async_starvation_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab41_rust_async_starvation.async_runner import run_async_target
+
+    mut_path = "fuzz_lab41_rust_async_starvation/ai_mutator_async.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 41 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_async", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(4141)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x4153594E
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab41_rust_async_starvation/async_target_bin"
+    crash_file = "fuzz_lab41_rust_async_starvation/in/crash_async.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_async_target(bin_path, crash_file)
+        assert res_exec["violation_detected"] is True
