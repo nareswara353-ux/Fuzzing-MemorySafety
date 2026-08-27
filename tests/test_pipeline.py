@@ -766,3 +766,30 @@ def test_java_auto_program_repair():
         assert res["no_regression"] is True
         assert res["patch_file"] is not None
         assert os.path.exists(res["patch_file"])
+
+def test_rust_memory_safety_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab36_rust_memory_safety.rust_runner import run_rust_target
+
+    mut_path = "fuzz_lab36_rust_memory_safety/ai_mutator_rust.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 36 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_rust", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(3636)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x54535552
+    assert len(res) >= 7
+    mut.deinit()
+
+    bin_path = "fuzz_lab36_rust_memory_safety/target_rust_bin"
+    crash_file = "fuzz_lab36_rust_memory_safety/in/crash_rust.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_rust_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True

@@ -26,6 +26,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Install System Dependencies & Toolchain
         run: |
           sudo apt-get update || true
@@ -33,7 +36,7 @@ jobs:
             llvm clang make gcc g++ python3-matplotlib python3-pytest || true
           pip install pytest z3-solver
 
-      - name: Compile Java & JNI Targets
+      - name: Compile Polyglot Targets
         run: |
           if [ -f "fuzz_lab24_java_jvm_harness/TargetParser.java" ]; then
             javac fuzz_lab24_java_jvm_harness/TargetParser.java
@@ -73,6 +76,9 @@ jobs:
           fi
           if [ -f "fuzz_lab35_java_auto_patching/VulnArrayHandler.java" ]; then
             javac fuzz_lab35_java_auto_patching/VulnArrayHandler.java
+          fi
+          if [ -f "fuzz_lab36_rust_memory_safety/target.rs" ]; then
+            rustc -g -O fuzz_lab36_rust_memory_safety/target.rs -o fuzz_lab36_rust_memory_safety/target_rust_bin
           fi
 
       - name: Verify Telemetry Dashboard Generation
