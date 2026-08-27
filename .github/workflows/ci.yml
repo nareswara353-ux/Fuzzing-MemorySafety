@@ -131,6 +131,11 @@ jobs:
             go build -o target_nil_bin .
             cd ..
           fi
+          if [ -f "fuzz_lab49_golang_cgo_memory_safety/cgo_target.go" ]; then
+            cd fuzz_lab49_golang_cgo_memory_safety
+            CGO_ENABLED=1 go build -o target_cgo_bin .
+            cd ..
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
