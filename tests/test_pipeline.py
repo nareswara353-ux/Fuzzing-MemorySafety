@@ -1104,3 +1104,30 @@ def test_golang_nil_deref_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_nil_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_golang_cgo_memory_safety_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab49_golang_cgo_memory_safety.cgo_runner import run_cgo_target
+
+    mut_path = "fuzz_lab49_golang_cgo_memory_safety/ai_mutator_cgo.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 49 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_cgo", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(4949)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x43474F21
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab49_golang_cgo_memory_safety/target_cgo_bin"
+    crash_file = "fuzz_lab49_golang_cgo_memory_safety/in/crash_cgo.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_cgo_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
