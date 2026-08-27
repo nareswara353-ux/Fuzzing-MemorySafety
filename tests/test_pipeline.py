@@ -982,3 +982,30 @@ def test_rust_macro_ast_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_macro_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_rust_crypto_timing_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab44_rust_crypto_timing.crypto_runner import run_crypto_target
+
+    mut_path = "fuzz_lab44_rust_crypto_timing/ai_mutator_crypto.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 44 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_crypto", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(4444)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x43525950
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab44_rust_crypto_timing/crypto_target_bin"
+    crash_file = "fuzz_lab44_rust_crypto_timing/in/crash_crypto.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_crypto_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
