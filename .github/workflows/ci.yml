@@ -161,6 +161,11 @@ jobs:
             go build -o target_refl_bin .
             cd ..
           fi
+          if [ -f "fuzz_lab55_golang_crypto_subtle/crypto_target.go" ]; then
+            cd fuzz_lab55_golang_crypto_subtle
+            go build -o target_crypto_bin .
+            cd ..
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
