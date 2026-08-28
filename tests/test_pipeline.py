@@ -1236,3 +1236,30 @@ def test_golang_msan_uninit_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_msan_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_golang_ast_reflection_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab54_golang_ast_reflection.reflection_runner import run_reflection_target
+
+    mut_path = "fuzz_lab54_golang_ast_reflection/ai_mutator_reflection.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 54 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_reflection", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(5454)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x5245464C
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab54_golang_ast_reflection/target_refl_bin"
+    crash_file = "fuzz_lab54_golang_ast_reflection/in/crash_refl.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_reflection_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
