@@ -1209,3 +1209,30 @@ def test_golang_grpc_protobuf_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_grpc_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_golang_msan_uninit_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab53_golang_msan_uninit.msan_runner import run_msan_target
+
+    mut_path = "fuzz_lab53_golang_msan_uninit/ai_mutator_msan.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 53 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_msan", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(5353)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x4D53414E
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab53_golang_msan_uninit/target_msan_bin"
+    crash_file = "fuzz_lab53_golang_msan_uninit/in/crash_msan.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_msan_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
