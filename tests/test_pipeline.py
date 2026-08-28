@@ -1131,3 +1131,30 @@ def test_golang_cgo_memory_safety_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_cgo_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_golang_unsafe_pointer_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab50_golang_unsafe_slice_header.unsafe_runner import run_unsafe_target
+
+    mut_path = "fuzz_lab50_golang_unsafe_slice_header/ai_mutator_unsafe.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 50 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_unsafe", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(5050)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x554E5346
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab50_golang_unsafe_slice_header/target_unsafe_bin"
+    crash_file = "fuzz_lab50_golang_unsafe_slice_header/in/crash_unsafe.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_unsafe_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
