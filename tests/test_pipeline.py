@@ -1183,3 +1183,29 @@ def test_golang_http_smuggling_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_http_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_golang_grpc_protobuf_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab52_golang_grpc_protobuf.grpc_runner import run_grpc_target
+
+    mut_path = "fuzz_lab52_golang_grpc_protobuf/ai_mutator_protobuf.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 52 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_protobuf", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(5252)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert len(res) >= 9
+    mut.deinit()
+
+    bin_path = "fuzz_lab52_golang_grpc_protobuf/target_grpc_bin"
+    crash_file = "fuzz_lab52_golang_grpc_protobuf/in/crash_grpc.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_grpc_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
