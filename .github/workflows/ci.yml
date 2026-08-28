@@ -1,12 +1,22 @@
-name: Compiler-Guided Neural Fuzzing CI
+name: Compiler-Guided Neural Fuzzing CI/CD
 
 on:
   push:
-    branches: [ main, master, experimental ]
+    branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
+  # ================= CI JOB =================
   build-and-verify:
     name: Polyglot Fuzzing Test Suite & Analysis Verification
     runs-on: ubuntu-latest
@@ -43,140 +53,69 @@ jobs:
 
       - name: Compile Polyglot Targets
         run: |
-          if [ -f "fuzz_lab24_java_jvm_harness/TargetParser.java" ]; then
-            javac fuzz_lab24_java_jvm_harness/TargetParser.java
-          fi
-          if [ -f "fuzz_lab25_java_deserialization/InsecureDeserializer.java" ]; then
-            javac fuzz_lab25_java_deserialization/InsecureDeserializer.java
-          fi
+          if [ -f "fuzz_lab24_java_jvm_harness/TargetParser.java" ]; then javac fuzz_lab24_java_jvm_harness/TargetParser.java; fi
+          if [ -f "fuzz_lab25_java_deserialization/InsecureDeserializer.java" ]; then javac fuzz_lab25_java_deserialization/InsecureDeserializer.java; fi
           if [ -f "fuzz_lab26_jni_boundary/NativeBridge.java" ]; then
-            cd fuzz_lab26_jni_boundary
-            javac NativeBridge.java
-            gcc -shared -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" native_lib.c -o libnative_engine.so
-            cd ..
+            cd fuzz_lab26_jni_boundary && javac NativeBridge.java && gcc -shared -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" native_lib.c -o libnative_engine.so && cd ..
           fi
-          if [ -f "fuzz_lab27_java_spel_ognl/SpelEvaluator.java" ]; then
-            javac fuzz_lab27_java_spel_ognl/SpelEvaluator.java
-          fi
-          if [ -f "fuzz_lab28_java_xxe_bomb/XxeTargetParser.java" ]; then
-            javac fuzz_lab28_java_xxe_bomb/XxeTargetParser.java
-          fi
-          if [ -f "fuzz_lab29_java_redos/RedosValidator.java" ]; then
-            javac fuzz_lab29_java_redos/RedosValidator.java
-          fi
-          if [ -f "fuzz_lab30_java_sql_injection/SqlTargetRepository.java" ]; then
-            javac fuzz_lab30_java_sql_injection/SqlTargetRepository.java
-          fi
-          if [ -f "fuzz_lab31_jvm_bytecode_agent/CoverageAgent.java" ]; then
-            javac fuzz_lab31_jvm_bytecode_agent/CoverageAgent.java fuzz_lab31_jvm_bytecode_agent/TargetApp.java
-          fi
-          if [ -f "fuzz_lab32_java_concurrency_deadlock/ConcurrentService.java" ]; then
-            javac fuzz_lab32_java_concurrency_deadlock/ConcurrentService.java
-          fi
-          if [ -f "fuzz_lab33_java_jwt_crypto/JwtAuthService.java" ]; then
-            javac fuzz_lab33_java_jwt_crypto/JwtAuthService.java
-          fi
-          if [ -f "fuzz_lab34_java_json_diff/JsonDifferentialOracle.java" ]; then
-            javac fuzz_lab34_java_json_diff/JsonDifferentialOracle.java
-          fi
-          if [ -f "fuzz_lab35_java_auto_patching/VulnArrayHandler.java" ]; then
-            javac fuzz_lab35_java_auto_patching/VulnArrayHandler.java
-          fi
-          if [ -f "fuzz_lab36_rust_memory_safety/target.rs" ]; then
-            rustc -g -O fuzz_lab36_rust_memory_safety/target.rs -o fuzz_lab36_rust_memory_safety/target_rust_bin
-          fi
-          if [ -f "fuzz_lab37_rust_integer_overflow/arithmetic_target.rs" ]; then
-            rustc -g -C overflow-checks=on fuzz_lab37_rust_integer_overflow/arithmetic_target.rs -o fuzz_lab37_rust_integer_overflow/arithmetic_target_bin
-          fi
+          if [ -f "fuzz_lab27_java_spel_ognl/SpelEvaluator.java" ]; then javac fuzz_lab27_java_spel_ognl/SpelEvaluator.java; fi
+          if [ -f "fuzz_lab28_java_xxe_bomb/XxeTargetParser.java" ]; then javac fuzz_lab28_java_xxe_bomb/XxeTargetParser.java; fi
+          if [ -f "fuzz_lab29_java_redos/RedosValidator.java" ]; then javac fuzz_lab29_java_redos/RedosValidator.java; fi
+          if [ -f "fuzz_lab30_java_sql_injection/SqlTargetRepository.java" ]; then javac fuzz_lab30_java_sql_injection/SqlTargetRepository.java; fi
+          if [ -f "fuzz_lab31_jvm_bytecode_agent/CoverageAgent.java" ]; then javac fuzz_lab31_jvm_bytecode_agent/CoverageAgent.java fuzz_lab31_jvm_bytecode_agent/TargetApp.java; fi
+          if [ -f "fuzz_lab32_java_concurrency_deadlock/ConcurrentService.java" ]; then javac fuzz_lab32_java_concurrency_deadlock/ConcurrentService.java; fi
+          if [ -f "fuzz_lab33_java_jwt_crypto/JwtAuthService.java" ]; then javac fuzz_lab33_java_jwt_crypto/JwtAuthService.java; fi
+          if [ -f "fuzz_lab34_java_json_diff/JsonDifferentialOracle.java" ]; then javac fuzz_lab34_java_json_diff/JsonDifferentialOracle.java; fi
+          if [ -f "fuzz_lab35_java_auto_patching/VulnArrayHandler.java" ]; then javac fuzz_lab35_java_auto_patching/VulnArrayHandler.java; fi
+          if [ -f "fuzz_lab36_rust_memory_safety/target.rs" ]; then rustc -g -O fuzz_lab36_rust_memory_safety/target.rs -o fuzz_lab36_rust_memory_safety/target_rust_bin; fi
+          if [ -f "fuzz_lab37_rust_integer_overflow/arithmetic_target.rs" ]; then rustc -g -C overflow-checks=on fuzz_lab37_rust_integer_overflow/arithmetic_target.rs -o fuzz_lab37_rust_integer_overflow/arithmetic_target_bin; fi
           if [ -f "fuzz_lab38_rust_ffi_boundary/main.rs" ]; then
-            cd fuzz_lab38_rust_ffi_boundary
-            gcc -c c_lib.c -o c_lib.o
-            ar rcs libc_lib.a c_lib.o
-            rustc -g -L . -l c_lib main.rs -o rust_ffi_bin
-            cd ..
+            cd fuzz_lab38_rust_ffi_boundary && gcc -c c_lib.c -o c_lib.o && ar rcs libc_lib.a c_lib.o && rustc -g -L . -l c_lib main.rs -o rust_ffi_bin && cd ..
           fi
-          if [ -f "fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target.rs" ]; then
-            rustc -g -O fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target.rs -o fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target_bin
-          fi
-          if [ -f "fuzz_lab40_rust_concurrency_poisoning/concurrency_target.rs" ]; then
-            rustc -g -O fuzz_lab40_rust_concurrency_poisoning/concurrency_target.rs -o fuzz_lab40_rust_concurrency_poisoning/concurrency_target_bin
-          fi
-          if [ -f "fuzz_lab41_rust_async_starvation/async_target.rs" ]; then
-            rustc -g -O fuzz_lab41_rust_async_starvation/async_target.rs -o fuzz_lab41_rust_async_starvation/async_target_bin
-          fi
-          if [ -f "fuzz_lab42_rust_asan_lsan/asan_target.rs" ]; then
-            rustc -g -O fuzz_lab42_rust_asan_lsan/asan_target.rs -o fuzz_lab42_rust_asan_lsan/asan_target_bin
-          fi
-          if [ -f "fuzz_lab43_rust_macro_ast/macro_target.rs" ]; then
-            rustc -g -O fuzz_lab43_rust_macro_ast/macro_target.rs -o fuzz_lab43_rust_macro_ast/macro_target_bin
-          fi
-          if [ -f "fuzz_lab44_rust_crypto_timing/crypto_target.rs" ]; then
-            rustc -g -O fuzz_lab44_rust_crypto_timing/crypto_target.rs -o fuzz_lab44_rust_crypto_timing/crypto_target_bin
-          fi
-          if [ -f "fuzz_lab45_rust_auto_patcher/vuln_target.rs" ]; then
-            rustc -g -O fuzz_lab45_rust_auto_patcher/vuln_target.rs -o fuzz_lab45_rust_auto_patcher/vuln_target_bin
-          fi
-          if [ -f "fuzz_lab46_golang_native_engine/main.go" ]; then
-            cd fuzz_lab46_golang_native_engine
-            go build -o target_go_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab47_golang_goroutine_race/race_target.go" ]; then
-            cd fuzz_lab47_golang_goroutine_race
-            go build -o target_race_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab48_golang_nil_deref/nil_target.go" ]; then
-            cd fuzz_lab48_golang_nil_deref
-            go build -o target_nil_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab49_golang_cgo_memory_safety/cgo_target.go" ]; then
-            cd fuzz_lab49_golang_cgo_memory_safety
-            CGO_ENABLED=1 go build -o target_cgo_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab50_golang_unsafe_slice_header/unsafe_target.go" ]; then
-            cd fuzz_lab50_golang_unsafe_slice_header
-            go build -o target_unsafe_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab51_golang_http_smuggling/http_target.go" ]; then
-            cd fuzz_lab51_golang_http_smuggling
-            go build -o target_http_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab52_golang_grpc_protobuf/grpc_target.go" ]; then
-            cd fuzz_lab52_golang_grpc_protobuf
-            go build -o target_grpc_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab53_golang_msan_uninit/msan_target.go" ]; then
-            cd fuzz_lab53_golang_msan_uninit
-            CGO_ENABLED=1 go build -o target_msan_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab54_golang_ast_reflection/reflection_target.go" ]; then
-            cd fuzz_lab54_golang_ast_reflection
-            go build -o target_refl_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab55_golang_crypto_subtle/crypto_target.go" ]; then
-            cd fuzz_lab55_golang_crypto_subtle
-            go build -o target_crypto_bin .
-            cd ..
-          fi
-          if [ -f "fuzz_lab56_golang_auto_patcher/vuln_target.go" ]; then
-            cd fuzz_lab56_golang_auto_patcher
-            go build -o target_vuln_bin .
-            cd ..
-          fi
-
-      - name: Verify Telemetry Dashboard Generation
-        run: |
-          python3 tools/generate_dashboard.py
-          test -f report_dashboard.html
+          if [ -f "fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target.rs" ]; then rustc -g -O fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target.rs -o fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target_bin; fi
+          if [ -f "fuzz_lab40_rust_concurrency_poisoning/concurrency_target.rs" ]; then rustc -g -O fuzz_lab40_rust_concurrency_poisoning/concurrency_target.rs -o fuzz_lab40_rust_concurrency_poisoning/concurrency_target_bin; fi
+          if [ -f "fuzz_lab41_rust_async_starvation/async_target.rs" ]; then rustc -g -O fuzz_lab41_rust_async_starvation/async_target.rs -o fuzz_lab41_rust_async_starvation/async_target_bin; fi
+          if [ -f "fuzz_lab42_rust_asan_lsan/asan_target.rs" ]; then rustc -g -O fuzz_lab42_rust_asan_lsan/asan_target.rs -o fuzz_lab42_rust_asan_lsan/asan_target_bin; fi
+          if [ -f "fuzz_lab43_rust_macro_ast/macro_target.rs" ]; then rustc -g -O fuzz_lab43_rust_macro_ast/macro_target.rs -o fuzz_lab43_rust_macro_ast/macro_target_bin; fi
+          if [ -f "fuzz_lab44_rust_crypto_timing/crypto_target.rs" ]; then rustc -g -O fuzz_lab44_rust_crypto_timing/crypto_target.rs -o fuzz_lab44_rust_crypto_timing/crypto_target_bin; fi
+          if [ -f "fuzz_lab45_rust_auto_patcher/vuln_target.rs" ]; then rustc -g -O fuzz_lab45_rust_auto_patcher/vuln_target.rs -o fuzz_lab45_rust_auto_patcher/vuln_target_bin; fi
+          if [ -f "fuzz_lab46_golang_native_engine/main.go" ]; then cd fuzz_lab46_golang_native_engine && go build -o target_go_bin . && cd ..; fi
+          if [ -f "fuzz_lab47_golang_goroutine_race/race_target.go" ]; then cd fuzz_lab47_golang_goroutine_race && go build -o target_race_bin . && cd ..; fi
+          if [ -f "fuzz_lab48_golang_nil_deref/nil_target.go" ]; then cd fuzz_lab48_golang_nil_deref && go build -o target_nil_bin . && cd ..; fi
+          if [ -f "fuzz_lab49_golang_cgo_memory_safety/cgo_target.go" ]; then cd fuzz_lab49_golang_cgo_memory_safety && CGO_ENABLED=1 go build -o target_cgo_bin . && cd ..; fi
+          if [ -f "fuzz_lab50_golang_unsafe_slice_header/unsafe_target.go" ]; then cd fuzz_lab50_golang_unsafe_slice_header && go build -o target_unsafe_bin . && cd ..; fi
+          if [ -f "fuzz_lab51_golang_http_smuggling/http_target.go" ]; then cd fuzz_lab51_golang_http_smuggling && go build -o target_http_bin . && cd ..; fi
+          if [ -f "fuzz_lab52_golang_grpc_protobuf/grpc_target.go" ]; then cd fuzz_lab52_golang_grpc_protobuf && go build -o target_grpc_bin . && cd ..; fi
+          if [ -f "fuzz_lab53_golang_msan_uninit/msan_target.go" ]; then cd fuzz_lab53_golang_msan_uninit && CGO_ENABLED=1 go build -o target_msan_bin . && cd ..; fi
+          if [ -f "fuzz_lab54_golang_ast_reflection/reflection_target.go" ]; then cd fuzz_lab54_golang_ast_reflection && go build -o target_refl_bin . && cd ..; fi
+          if [ -f "fuzz_lab55_golang_crypto_subtle/crypto_target.go" ]; then cd fuzz_lab55_golang_crypto_subtle && go build -o target_crypto_bin . && cd ..; fi
+          if [ -f "fuzz_lab56_golang_auto_patcher/vuln_target.go" ]; then cd fuzz_lab56_golang_auto_patcher && go build -o target_vuln_bin . && cd ..; fi
 
       - name: Execute Automated Regression Test Suite (pytest)
         run: |
           pytest -v tests/
+
+      - name: Generate Fresh Telemetry Dashboard & Stage Web Root
+        run: |
+          python3 tools/generate_dashboard.py
+          mkdir -p _site
+          cp report_dashboard.html _site/index.html
+
+      - name: Upload Artifact for Deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_site'
+
+  # ================= CD JOB =================
+  deploy-dashboard:
+    name: Continuous Deployment (GitHub Pages)
+    needs: build-and-verify
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Telemetry Report to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
