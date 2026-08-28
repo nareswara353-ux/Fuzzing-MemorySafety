@@ -1,0 +1,7 @@
+--- vuln_target.go (Original)
++++ vuln_target.go (Patched)
+@@ -12,2 +12,5 @@
+ 	copyLen := len(data)
++	if copyLen > len(fixedBuf) {
++		copyLen = len(fixedBuf)
++	}
