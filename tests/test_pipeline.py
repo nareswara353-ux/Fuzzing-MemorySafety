@@ -1158,3 +1158,28 @@ def test_golang_unsafe_pointer_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_unsafe_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_golang_http_smuggling_fuzzing():
+    import importlib.util
+    from fuzz_lab51_golang_http_smuggling.http_runner import run_http_target
+
+    mut_path = "fuzz_lab51_golang_http_smuggling/ai_mutator_http.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 51 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_http", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(5151)
+    sample = bytearray(b"GET / HTTP/1.1\r\nHost: localhost\r\n\r\n")
+    res = mut.fuzz(sample, None, 512)
+
+    assert b"HTTP/1.1" in res
+    mut.deinit()
+
+    bin_path = "fuzz_lab51_golang_http_smuggling/target_http_bin"
+    crash_file = "fuzz_lab51_golang_http_smuggling/in/crash_http.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_http_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
