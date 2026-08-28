@@ -146,6 +146,11 @@ jobs:
             go build -o target_http_bin .
             cd ..
           fi
+          if [ -f "fuzz_lab52_golang_grpc_protobuf/grpc_target.go" ]; then
+            cd fuzz_lab52_golang_grpc_protobuf
+            go build -o target_grpc_bin .
+            cd ..
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
