@@ -1,0 +1,5 @@
+--- vuln_target.rs (Original)
++++ vuln_target.rs (Patched)
+@@ -11,2 +11,2 @@
+-    let copy_len = data.len();
++    let copy_len = std::cmp::min(data.len(), fixed_buf.len());
