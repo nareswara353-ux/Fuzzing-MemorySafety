@@ -1263,3 +1263,30 @@ def test_golang_ast_reflection_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_reflection_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_golang_crypto_subtle_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab55_golang_crypto_subtle.crypto_runner import run_crypto_target
+
+    mut_path = "fuzz_lab55_golang_crypto_subtle/ai_mutator_crypto_go.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 55 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_crypto_go", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(5555)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x474F5342
+    assert len(res) >= 5
+    mut.deinit()
+
+    bin_path = "fuzz_lab55_golang_crypto_subtle/target_crypto_bin"
+    crash_file = "fuzz_lab55_golang_crypto_subtle/in/crash_crypto.bin"
+    if os.path.exists(bin_path) and os.path.exists(crash_file):
+        res_exec = run_crypto_target(bin_path, crash_file)
+        assert res_exec["crashed"] is True
