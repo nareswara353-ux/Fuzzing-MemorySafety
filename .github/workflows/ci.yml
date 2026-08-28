@@ -136,6 +136,11 @@ jobs:
             CGO_ENABLED=1 go build -o target_cgo_bin .
             cd ..
           fi
+          if [ -f "fuzz_lab50_golang_unsafe_slice_header/unsafe_target.go" ]; then
+            cd fuzz_lab50_golang_unsafe_slice_header
+            go build -o target_unsafe_bin .
+            cd ..
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
