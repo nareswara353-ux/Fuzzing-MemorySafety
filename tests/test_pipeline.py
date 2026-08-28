@@ -1290,3 +1290,17 @@ def test_golang_crypto_subtle_fuzzing():
     if os.path.exists(bin_path) and os.path.exists(crash_file):
         res_exec = run_crypto_target(bin_path, crash_file)
         assert res_exec["crashed"] is True
+
+def test_golang_auto_program_repair():
+    from tools.go_auto_patcher import patch_and_verify_go
+
+    src = "fuzz_lab56_golang_auto_patcher/vuln_target.go"
+    crash = "fuzz_lab56_golang_auto_patcher/in/crash_poc.bin"
+    seed = "fuzz_lab56_golang_auto_patcher/in/seed_valid.bin"
+
+    if os.path.exists(src) and os.path.exists(crash) and os.path.exists(seed):
+        res = patch_and_verify_go(src, crash, seed)
+        assert res["crash_fixed"] is True
+        assert res["no_regression"] is True
+        assert res["patch_file"] is not None
+        assert os.path.exists(res["patch_file"])
