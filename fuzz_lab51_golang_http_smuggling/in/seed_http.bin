@@ -1,0 +1,6 @@
+POST /api/v1/data HTTP/1.1
+Host: internal.service
+Content-Type: application/json
+Content-Length: 18
+
+{"status":"valid"}
