@@ -151,6 +151,11 @@ jobs:
             go build -o target_grpc_bin .
             cd ..
           fi
+          if [ -f "fuzz_lab53_golang_msan_uninit/msan_target.go" ]; then
+            cd fuzz_lab53_golang_msan_uninit
+            CGO_ENABLED=1 go build -o target_msan_bin .
+            cd ..
+          fi
 
       - name: Verify Telemetry Dashboard Generation
         run: |
