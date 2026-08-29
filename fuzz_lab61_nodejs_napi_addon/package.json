@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab61_nodejs_napi_addon",
+  "version": "1.0.0",
+  "description": "Lab 61 Node.js N-API Native Addon Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
