@@ -54,14 +54,13 @@ jobs:
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             llvm clang make gcc g++ python3-matplotlib python3-pytest || true
           pip install pytest z3-solver
+          npm install -g typescript
 
       - name: Compile Polyglot Targets
         run: |
           if [ -f "fuzz_lab24_java_jvm_harness/TargetParser.java" ]; then javac fuzz_lab24_java_jvm_harness/TargetParser.java; fi
           if [ -f "fuzz_lab25_java_deserialization/InsecureDeserializer.java" ]; then javac fuzz_lab25_java_deserialization/InsecureDeserializer.java; fi
-          if [ -f "fuzz_lab26_jni_boundary/NativeBridge.java" ]; then
-            cd fuzz_lab26_jni_boundary && javac NativeBridge.java && gcc -shared -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" native_lib.c -o libnative_engine.so && cd ..
-          fi
+          if [ -f "fuzz_lab26_jni_boundary/NativeBridge.java" ]; then cd fuzz_lab26_jni_boundary && javac NativeBridge.java && gcc -shared -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" native_lib.c -o libnative_engine.so && cd ..; fi
           if [ -f "fuzz_lab27_java_spel_ognl/SpelEvaluator.java" ]; then javac fuzz_lab27_java_spel_ognl/SpelEvaluator.java; fi
           if [ -f "fuzz_lab28_java_xxe_bomb/XxeTargetParser.java" ]; then javac fuzz_lab28_java_xxe_bomb/XxeTargetParser.java; fi
           if [ -f "fuzz_lab29_java_redos/RedosValidator.java" ]; then javac fuzz_lab29_java_redos/RedosValidator.java; fi
@@ -73,9 +72,7 @@ jobs:
           if [ -f "fuzz_lab35_java_auto_patching/VulnArrayHandler.java" ]; then javac fuzz_lab35_java_auto_patching/VulnArrayHandler.java; fi
           if [ -f "fuzz_lab36_rust_memory_safety/target.rs" ]; then rustc -g -O fuzz_lab36_rust_memory_safety/target.rs -o fuzz_lab36_rust_memory_safety/target_rust_bin; fi
           if [ -f "fuzz_lab37_rust_integer_overflow/arithmetic_target.rs" ]; then rustc -g -C overflow-checks=on fuzz_lab37_rust_integer_overflow/arithmetic_target.rs -o fuzz_lab37_rust_integer_overflow/arithmetic_target_bin; fi
-          if [ -f "fuzz_lab38_rust_ffi_boundary/main.rs" ]; then
-            cd fuzz_lab38_rust_ffi_boundary && gcc -c c_lib.c -o c_lib.o && ar rcs libc_lib.a c_lib.o && rustc -g -L . -l c_lib main.rs -o rust_ffi_bin && cd ..
-          fi
+          if [ -f "fuzz_lab38_rust_ffi_boundary/main.rs" ]; then cd fuzz_lab38_rust_ffi_boundary && gcc -c c_lib.c -o c_lib.o && ar rcs libc_lib.a c_lib.o && rustc -g -L . -l c_lib main.rs -o rust_ffi_bin && cd ..; fi
           if [ -f "fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target.rs" ]; then rustc -g -O fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target.rs -o fuzz_lab39_rust_serde_zerocopy/serde_zerocopy_target_bin; fi
           if [ -f "fuzz_lab40_rust_concurrency_poisoning/concurrency_target.rs" ]; then rustc -g -O fuzz_lab40_rust_concurrency_poisoning/concurrency_target.rs -o fuzz_lab40_rust_concurrency_poisoning/concurrency_target_bin; fi
           if [ -f "fuzz_lab41_rust_async_starvation/async_target.rs" ]; then rustc -g -O fuzz_lab41_rust_async_starvation/async_target.rs -o fuzz_lab41_rust_async_starvation/async_target_bin; fi
@@ -94,9 +91,8 @@ jobs:
           if [ -f "fuzz_lab54_golang_ast_reflection/reflection_target.go" ]; then cd fuzz_lab54_golang_ast_reflection && go build -o target_refl_bin . && cd ..; fi
           if [ -f "fuzz_lab55_golang_crypto_subtle/crypto_target.go" ]; then cd fuzz_lab55_golang_crypto_subtle && go build -o target_crypto_bin . && cd ..; fi
           if [ -f "fuzz_lab56_golang_auto_patcher/vuln_target.go" ]; then cd fuzz_lab56_golang_auto_patcher && go build -o target_vuln_bin . && cd ..; fi
-          if [ -f "fuzz_lab61_nodejs_napi_addon/addon.c" ]; then
-            cd fuzz_lab61_nodejs_napi_addon && gcc -shared -fPIC addon.c -o addon.node && cd ..
-          fi
+          if [ -f "fuzz_lab61_nodejs_napi_addon/addon.c" ]; then cd fuzz_lab61_nodejs_napi_addon && gcc -shared -fPIC addon.c -o addon.node && cd ..; fi
+          if [ -f "fuzz_lab62_typescript_type_erasure/target.ts" ]; then cd fuzz_lab62_typescript_type_erasure && tsc target.ts && cd ..; fi
 
       - name: Execute Automated Regression Test Suite (pytest)
         run: |
