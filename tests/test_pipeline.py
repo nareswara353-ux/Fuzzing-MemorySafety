@@ -1408,3 +1408,29 @@ def test_nodejs_vm_context_escape_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_vm_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_napi_addon_fuzzing():
+    import importlib.util
+    from fuzz_lab61_nodejs_napi_addon.napi_runner import run_napi_target
+
+    mut_path = "fuzz_lab61_nodejs_napi_addon/ai_mutator_napi.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 61 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_napi", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6161)
+    sample = bytearray(b"SAFE_DATA")
+    res = mut.fuzz(sample, None, 64)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    target_js = "fuzz_lab61_nodejs_napi_addon/target.js"
+    crash_file = "fuzz_lab61_nodejs_napi_addon/in/crash_napi.txt"
+    addon_file = "fuzz_lab61_nodejs_napi_addon/addon.node"
+    if os.path.exists(target_js) and os.path.exists(crash_file) and os.path.exists(addon_file):
+        res_exec = run_napi_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
