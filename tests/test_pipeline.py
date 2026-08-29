@@ -1304,3 +1304,30 @@ def test_golang_auto_program_repair():
         assert res["no_regression"] is True
         assert res["patch_file"] is not None
         assert os.path.exists(res["patch_file"])
+
+def test_nodejs_prototype_pollution_fuzzing():
+    import importlib.util
+    import json
+    from fuzz_lab57_nodejs_prototype_pollution.js_runner import run_js_target
+
+    mut_path = "fuzz_lab57_nodejs_prototype_pollution/ai_mutator_pollution.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 57 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_pollution", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(5757)
+    sample = bytearray(b"{}")
+    res = mut.fuzz(sample, None, 256)
+
+    parsed = json.loads(res.decode("utf-8"))
+    assert isinstance(parsed, dict)
+    mut.deinit()
+
+    target_js = "fuzz_lab57_nodejs_prototype_pollution/target.js"
+    crash_file = "fuzz_lab57_nodejs_prototype_pollution/in/crash_pollution.json"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_js_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
