@@ -1356,3 +1356,30 @@ def test_nodejs_eventloop_redos_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_eventloop_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_worker_threads_race_fuzzing():
+    import importlib.util
+    import json
+    from fuzz_lab59_nodejs_worker_threads_race.worker_runner import run_worker_target
+
+    mut_path = "fuzz_lab59_nodejs_worker_threads_race/ai_mutator_worker.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 59 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_worker", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(5959)
+    sample = bytearray(b"{}")
+    res = mut.fuzz(sample, None, 256)
+
+    parsed = json.loads(res.decode("utf-8"))
+    assert "mode" in parsed
+    mut.deinit()
+
+    target_js = "fuzz_lab59_nodejs_worker_threads_race/target.js"
+    crash_file = "fuzz_lab59_nodejs_worker_threads_race/in/crash_race.json"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_worker_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
