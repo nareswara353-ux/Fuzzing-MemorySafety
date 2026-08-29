@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab60_nodejs_vm_context_escape",
+  "version": "1.0.0",
+  "description": "Lab 60 Node.js VM Context Sandbox Escape Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
