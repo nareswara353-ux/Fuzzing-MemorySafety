@@ -1331,3 +1331,28 @@ def test_nodejs_prototype_pollution_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_js_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_eventloop_redos_fuzzing():
+    import importlib.util
+    from fuzz_lab58_nodejs_eventloop_redos.eventloop_runner import run_eventloop_target
+
+    mut_path = "fuzz_lab58_nodejs_eventloop_redos/ai_mutator_redos.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 58 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_redos", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(5858)
+    sample = bytearray(b"aaaa")
+    res = mut.fuzz(sample, None, 64)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    target_js = "fuzz_lab58_nodejs_eventloop_redos/target.js"
+    crash_file = "fuzz_lab58_nodejs_eventloop_redos/in/crash_redos.txt"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_eventloop_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
