@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab57_nodejs_prototype_pollution",
+  "version": "1.0.0",
+  "description": "Lab 57 Node.js Prototype Pollution Fuzzer Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
