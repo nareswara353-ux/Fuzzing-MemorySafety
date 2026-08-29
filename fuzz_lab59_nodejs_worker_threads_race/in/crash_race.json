@@ -1,0 +1,5 @@
+{
+  "mode": "RACE_TRIGGER",
+  "threads": 2,
+  "increments": 500
+}
