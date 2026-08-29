@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab58_nodejs_eventloop_redos",
+  "version": "1.0.0",
+  "description": "Lab 58 Node.js Event Loop Starvation and ReDoS Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
