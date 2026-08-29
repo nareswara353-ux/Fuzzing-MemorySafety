@@ -94,6 +94,9 @@ jobs:
           if [ -f "fuzz_lab54_golang_ast_reflection/reflection_target.go" ]; then cd fuzz_lab54_golang_ast_reflection && go build -o target_refl_bin . && cd ..; fi
           if [ -f "fuzz_lab55_golang_crypto_subtle/crypto_target.go" ]; then cd fuzz_lab55_golang_crypto_subtle && go build -o target_crypto_bin . && cd ..; fi
           if [ -f "fuzz_lab56_golang_auto_patcher/vuln_target.go" ]; then cd fuzz_lab56_golang_auto_patcher && go build -o target_vuln_bin . && cd ..; fi
+          if [ -f "fuzz_lab61_nodejs_napi_addon/addon.c" ]; then
+            cd fuzz_lab61_nodejs_napi_addon && gcc -shared -fPIC addon.c -o addon.node && cd ..
+          fi
 
       - name: Execute Automated Regression Test Suite (pytest)
         run: |
