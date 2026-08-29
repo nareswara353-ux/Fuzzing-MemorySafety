@@ -1383,3 +1383,28 @@ def test_nodejs_worker_threads_race_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_worker_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_vm_context_escape_fuzzing():
+    import importlib.util
+    from fuzz_lab60_nodejs_vm_context_escape.vm_runner import run_vm_target
+
+    mut_path = "fuzz_lab60_nodejs_vm_context_escape/ai_mutator_vm.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 60 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_vm", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6060)
+    sample = bytearray(b"data.value * 2;")
+    res = mut.fuzz(sample, None, 128)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    target_js = "fuzz_lab60_nodejs_vm_context_escape/target.js"
+    crash_file = "fuzz_lab60_nodejs_vm_context_escape/in/crash_escape.txt"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_vm_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
