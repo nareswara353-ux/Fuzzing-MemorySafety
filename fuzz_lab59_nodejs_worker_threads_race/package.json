@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab59_nodejs_worker_threads_race",
+  "version": "1.0.0",
+  "description": "Lab 59 Node.js Worker Threads SharedArrayBuffer Race Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
