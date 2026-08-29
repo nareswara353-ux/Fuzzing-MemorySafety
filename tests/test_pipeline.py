@@ -1434,3 +1434,30 @@ def test_nodejs_napi_addon_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file) and os.path.exists(addon_file):
         res_exec = run_napi_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_typescript_type_erasure_fuzzing():
+    import importlib.util
+    import json
+    from fuzz_lab62_typescript_type_erasure.ts_runner import run_ts_target
+
+    mut_path = "fuzz_lab62_typescript_type_erasure/ai_mutator_ts_type.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 62 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_ts_type", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6262)
+    sample = bytearray(b"{}")
+    res = mut.fuzz(sample, None, 256)
+
+    parsed = json.loads(res.decode("utf-8"))
+    assert "userId" in parsed
+    mut.deinit()
+
+    compiled_js = "fuzz_lab62_typescript_type_erasure/target.js"
+    crash_file = "fuzz_lab62_typescript_type_erasure/in/crash_type_confusion.json"
+    if os.path.exists(compiled_js) and os.path.exists(crash_file):
+        res_exec = run_ts_target(compiled_js, crash_file)
+        assert res_exec["crashed"] is True
