@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab65_nodejs_wasm_memory",
+  "version": "1.0.0",
+  "description": "Lab 65 Node.js WebAssembly Linear Memory Sandboxing Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
