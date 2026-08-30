@@ -1515,3 +1515,30 @@ def test_nodejs_crypto_timing_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_crypto_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_wasm_memory_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab65_nodejs_wasm_memory.wasm_runner import run_wasm_target
+
+    mut_path = "fuzz_lab65_nodejs_wasm_memory/ai_mutator_wasm.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 65 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_wasm", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6565)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x5741534D
+    assert len(res) >= 9
+    mut.deinit()
+
+    target_js = "fuzz_lab65_nodejs_wasm_memory/target.js"
+    crash_file = "fuzz_lab65_nodejs_wasm_memory/in/crash_wasm.bin"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_wasm_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
