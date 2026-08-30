@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab68_typescript_decorator_di",
+  "version": "1.0.0",
+  "description": "Lab 68 TypeScript Decorator and Insecure DI Container Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
