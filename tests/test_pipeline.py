@@ -1488,3 +1488,30 @@ def test_nodejs_buffer_oob_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_buffer_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_crypto_timing_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab64_nodejs_crypto_timing.crypto_runner import run_crypto_target
+
+    mut_path = "fuzz_lab64_nodejs_crypto_timing/ai_mutator_crypto_js.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 64 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_crypto_js", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6464)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x4A534352
+    assert len(res) >= 5
+    mut.deinit()
+
+    target_js = "fuzz_lab64_nodejs_crypto_timing/target.js"
+    crash_file = "fuzz_lab64_nodejs_crypto_timing/in/crash_crypto.bin"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_crypto_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
