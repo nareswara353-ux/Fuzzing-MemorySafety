@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab70_javascript_regex_lookaround_dos",
+  "version": "1.0.0",
+  "description": "Lab 70 JavaScript Regex Lookaround DoS Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
