@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab67_nodejs_child_process_injection",
+  "version": "1.0.0",
+  "description": "Lab 67 Node.js Child Process Command Injection Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
