@@ -1621,3 +1621,30 @@ def test_typescript_decorator_di_fuzzing():
     if os.path.exists(compiled_js) and os.path.exists(crash_file):
         res_exec = run_di_target(compiled_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_stream_backpressure_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab69_nodejs_streams_backpressure.stream_runner import run_stream_target
+
+    mut_path = "fuzz_lab69_nodejs_streams_backpressure/ai_mutator_stream.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 69 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_stream", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6969)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x5354524D
+    assert len(res) >= 7
+    mut.deinit()
+
+    target_js = "fuzz_lab69_nodejs_streams_backpressure/target.js"
+    crash_file = "fuzz_lab69_nodejs_streams_backpressure/in/crash_stream.bin"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_stream_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
