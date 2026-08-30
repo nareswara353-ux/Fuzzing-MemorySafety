@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab63_nodejs_buffer_oob",
+  "version": "1.0.0",
+  "description": "Lab 63 Node.js Buffer API Insecure Allocation and OOB Fuzzer",
+  "main": "target.js",
+  "type": "commonjs"
+}
