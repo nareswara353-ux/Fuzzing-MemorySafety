@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab66_nodejs_http2_rapid_reset",
+  "version": "1.0.0",
+  "description": "Lab 66 Node.js HTTP/2 Rapid Reset Fuzzer Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
