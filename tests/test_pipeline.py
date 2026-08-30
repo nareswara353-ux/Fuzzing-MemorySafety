@@ -1542,3 +1542,30 @@ def test_nodejs_wasm_memory_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_wasm_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_http2_rapid_reset_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab66_nodejs_http2_rapid_reset.http2_runner import run_http2_target
+
+    mut_path = "fuzz_lab66_nodejs_http2_rapid_reset/ai_mutator_http2.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 66 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_http2", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6666)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x48325354
+    assert len(res) >= 8
+    mut.deinit()
+
+    target_js = "fuzz_lab66_nodejs_http2_rapid_reset/target.js"
+    crash_file = "fuzz_lab66_nodejs_http2_rapid_reset/in/crash_http2.bin"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_http2_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
