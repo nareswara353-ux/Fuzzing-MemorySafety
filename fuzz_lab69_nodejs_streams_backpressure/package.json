@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab69_nodejs_streams_backpressure",
+  "version": "1.0.0",
+  "description": "Lab 69 Node.js Streams Pipeline Backpressure Fuzzer Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
