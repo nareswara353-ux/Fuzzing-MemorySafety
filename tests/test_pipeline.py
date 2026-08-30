@@ -1648,3 +1648,28 @@ def test_nodejs_stream_backpressure_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_stream_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_javascript_regex_lookaround_dos_fuzzing():
+    import importlib.util
+    from fuzz_lab70_javascript_regex_lookaround_dos.lookaround_runner import run_lookaround_target
+
+    mut_path = "fuzz_lab70_javascript_regex_lookaround_dos/ai_mutator_lookaround.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 70 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_lookaround", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(7070)
+    sample = bytearray(b"ValidPass123!")
+    res = mut.fuzz(sample, None, 64)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    target_js = "fuzz_lab70_javascript_regex_lookaround_dos/target.js"
+    crash_file = "fuzz_lab70_javascript_regex_lookaround_dos/in/crash_lookaround.txt"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_lookaround_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
