@@ -1461,3 +1461,30 @@ def test_typescript_type_erasure_fuzzing():
     if os.path.exists(compiled_js) and os.path.exists(crash_file):
         res_exec = run_ts_target(compiled_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_buffer_oob_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab63_nodejs_buffer_oob.buffer_runner import run_buffer_target
+
+    mut_path = "fuzz_lab63_nodejs_buffer_oob/ai_mutator_buffer.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 63 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_buffer", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6363)
+    sample = bytearray(b"\x00" * 32)
+    res = mut.fuzz(sample, None, 64)
+
+    assert struct.unpack("<I", res[:4])[0] == 0x42554646
+    assert len(res) >= 9
+    mut.deinit()
+
+    target_js = "fuzz_lab63_nodejs_buffer_oob/target.js"
+    crash_file = "fuzz_lab63_nodejs_buffer_oob/in/crash_buffer.bin"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_buffer_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
