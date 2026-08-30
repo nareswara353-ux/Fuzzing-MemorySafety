@@ -1,0 +1,7 @@
+{
+  "name": "fuzz_lab64_nodejs_crypto_timing",
+  "version": "1.0.0",
+  "description": "Lab 64 Node.js Crypto Timing Side-Channel Target",
+  "main": "target.js",
+  "type": "commonjs"
+}
