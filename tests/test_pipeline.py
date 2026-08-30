@@ -1594,3 +1594,30 @@ def test_nodejs_child_process_injection_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_cmd_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_typescript_decorator_di_fuzzing():
+    import importlib.util
+    import json
+    from fuzz_lab68_typescript_decorator_di.di_runner import run_di_target
+
+    mut_path = "fuzz_lab68_typescript_decorator_di/ai_mutator_di.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 68 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_di", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6868)
+    sample = bytearray(b"{}")
+    res = mut.fuzz(sample, None, 256)
+
+    parsed = json.loads(res.decode("utf-8"))
+    assert "serviceToken" in parsed
+    mut.deinit()
+
+    compiled_js = "fuzz_lab68_typescript_decorator_di/target.js"
+    crash_file = "fuzz_lab68_typescript_decorator_di/in/crash_di.json"
+    if os.path.exists(compiled_js) and os.path.exists(crash_file):
+        res_exec = run_di_target(compiled_js, crash_file)
+        assert res_exec["crashed"] is True
