@@ -1569,3 +1569,28 @@ def test_nodejs_http2_rapid_reset_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_http2_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_nodejs_child_process_injection_fuzzing():
+    import importlib.util
+    from fuzz_lab67_nodejs_child_process_injection.cmd_runner import run_cmd_target
+
+    mut_path = "fuzz_lab67_nodejs_child_process_injection/ai_mutator_cmd.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 67 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_cmd", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(6767)
+    sample = bytearray(b"file.txt")
+    res = mut.fuzz(sample, None, 64)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    target_js = "fuzz_lab67_nodejs_child_process_injection/target.js"
+    crash_file = "fuzz_lab67_nodejs_child_process_injection/in/crash_cmd.txt"
+    if os.path.exists(target_js) and os.path.exists(crash_file):
+        res_exec = run_cmd_target(target_js, crash_file)
+        assert res_exec["crashed"] is True
