@@ -93,6 +93,7 @@ jobs:
           if [ -f "fuzz_lab56_golang_auto_patcher/vuln_target.go" ]; then cd fuzz_lab56_golang_auto_patcher && go build -o target_vuln_bin . && cd ..; fi
           if [ -f "fuzz_lab61_nodejs_napi_addon/addon.c" ]; then cd fuzz_lab61_nodejs_napi_addon && gcc -shared -fPIC addon.c -o addon.node && cd ..; fi
           if [ -f "fuzz_lab62_typescript_type_erasure/target.ts" ]; then cd fuzz_lab62_typescript_type_erasure && tsc target.ts && cd ..; fi
+          if [ -f "fuzz_lab68_typescript_decorator_di/target.ts" ]; then cd fuzz_lab68_typescript_decorator_di && tsc target.ts && cd ..; fi
 
       - name: Execute Automated Regression Test Suite (pytest)
         run: |
