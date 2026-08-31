@@ -1681,3 +1681,28 @@ def test_python_cext_buffer_overflow():
     if os.path.exists(target) and os.path.exists(crash):
         res = run_cext_target(target, crash)
         assert res["crashed"] == True
+
+def test_cpython_refcount_uaf_fuzzing():
+    import importlib.util
+    from fuzz_lab72_cpython_refcount_uaf.refcount_runner import run_refcount_target
+
+    mut_path = "fuzz_lab72_cpython_refcount_uaf/ai_mutator_refcount.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 72 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_refcount", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(7272)
+    sample = bytearray(b"SAFE_DATA")
+    res = mut.fuzz(sample, None, 64)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    target_py = "fuzz_lab72_cpython_refcount_uaf/target.py"
+    crash_file = "fuzz_lab72_cpython_refcount_uaf/in/crash_uaf.txt"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_refcount_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
