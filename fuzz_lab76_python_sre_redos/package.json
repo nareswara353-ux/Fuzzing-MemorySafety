@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab76_python_sre_redos",
+  "version": "1.0.0",
+  "description": "Lab 76 Python SRE ReDoS Target",
+  "main": "target.py"
+}
