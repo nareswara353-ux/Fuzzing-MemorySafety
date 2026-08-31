@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab74_cpython_gil_deadlock",
+  "version": "1.0.0",
+  "description": "Lab 74 CPython GIL Concurrency and Native Deadlock Target",
+  "main": "target.py"
+}
