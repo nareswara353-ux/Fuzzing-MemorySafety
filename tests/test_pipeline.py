@@ -1757,3 +1757,28 @@ def test_cpython_gil_deadlock_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_gil_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_sandbox_escape_fuzzing():
+    import importlib.util
+    from fuzz_lab75_python_sandbox_escape.sandbox_runner import run_sandbox_target
+
+    mut_path = "fuzz_lab75_python_sandbox_escape/ai_mutator_sandbox.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 75 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_sandbox", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(7575)
+    sample = bytearray(b"1+1")
+    res = mut.fuzz(sample, None, 128)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    target_py = "fuzz_lab75_python_sandbox_escape/target.py"
+    crash_file = "fuzz_lab75_python_sandbox_escape/in/crash_escape.txt"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_sandbox_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
