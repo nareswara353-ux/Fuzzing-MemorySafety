@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab71_cpython_c_extension",
+  "version": "1.0.0",
+  "description": "Lab 71 CPython C-Extension Buffer Overflow Target",
+  "main": "target.py"
+}
