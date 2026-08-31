@@ -1732,3 +1732,28 @@ def test_python_pickle_deserialization_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_pickle_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_cpython_gil_deadlock_fuzzing():
+    import importlib.util
+    from fuzz_lab74_cpython_gil_deadlock.gil_runner import run_gil_target
+
+    mut_path = "fuzz_lab74_cpython_gil_deadlock/ai_mutator_gil.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 74 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_gil", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(7474)
+    sample = bytearray(b"SAFE_TASK")
+    res = mut.fuzz(sample, None, 64)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    target_py = "fuzz_lab74_cpython_gil_deadlock/target.py"
+    crash_file = "fuzz_lab74_cpython_gil_deadlock/in/crash_gil.txt"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_gil_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
