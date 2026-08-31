@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab75_python_sandbox_escape",
+  "version": "1.0.0",
+  "description": "Lab 75 Python AST and Sandbox Escape Target",
+  "main": "target.py"
+}
