@@ -1706,3 +1706,29 @@ def test_cpython_refcount_uaf_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_refcount_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_pickle_deserialization_fuzzing():
+    import importlib.util
+    from fuzz_lab73_python_pickle_deserialization.pickle_runner import run_pickle_target
+
+    mut_path = "fuzz_lab73_python_pickle_deserialization/ai_mutator_pickle.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 73 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_pickle", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(7373)
+    sample = bytearray(b"\x00" * 16)
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"PKL\x00"
+    assert len(res) >= 5
+    mut.deinit()
+
+    target_py = "fuzz_lab73_python_pickle_deserialization/target.py"
+    crash_file = "fuzz_lab73_python_pickle_deserialization/in/crash_pickle.bin"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_pickle_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
