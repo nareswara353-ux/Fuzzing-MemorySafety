@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab73_python_pickle_deserialization",
+  "version": "1.0.0",
+  "description": "Lab 73 Python Insecure Object Deserialization Target",
+  "main": "target.py"
+}
