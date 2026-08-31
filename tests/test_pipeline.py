@@ -1807,3 +1807,28 @@ def test_python_sre_redos_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_redos_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_ctypes_ffi_fuzzing():
+    import importlib.util
+    from fuzz_lab77_python_ctypes_ffi.ctypes_runner import run_ctypes_target
+
+    mut_path = "fuzz_lab77_python_ctypes_ffi/ai_mutator_ctypes.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 77 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_ctypes", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(7777)
+    sample = bytearray(b"\x00" * 40)
+    res = mut.fuzz(sample, None, 40)
+
+    assert len(res) == 40
+    mut.deinit()
+
+    target_py = "fuzz_lab77_python_ctypes_ffi/target.py"
+    crash_file = "fuzz_lab77_python_ctypes_ffi/in/crash_ctypes.bin"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_ctypes_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
