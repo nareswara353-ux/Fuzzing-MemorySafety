@@ -1782,3 +1782,28 @@ def test_python_sandbox_escape_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_sandbox_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_sre_redos_fuzzing():
+    import importlib.util
+    from fuzz_lab76_python_sre_redos.redos_runner import run_redos_target
+
+    mut_path = "fuzz_lab76_python_sre_redos/ai_mutator_redos.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 76 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_redos", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(7676)
+    sample = bytearray(b"test@mail.com")
+    res = mut.fuzz(sample, None, 64)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    target_py = "fuzz_lab76_python_sre_redos/target.py"
+    crash_file = "fuzz_lab76_python_sre_redos/in/crash_redos.txt"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_redos_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
