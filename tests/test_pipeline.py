@@ -1673,3 +1673,11 @@ def test_javascript_regex_lookaround_dos_fuzzing():
     if os.path.exists(target_js) and os.path.exists(crash_file):
         res_exec = run_lookaround_target(target_js, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_cext_buffer_overflow():
+    from fuzz_lab71_cpython_c_extension.cext_runner import run_cext_target
+    target = "fuzz_lab71_cpython_c_extension/target.py"
+    crash = "fuzz_lab71_cpython_c_extension/in/crash_overflow.txt"
+    if os.path.exists(target) and os.path.exists(crash):
+        res = run_cext_target(target, crash)
+        assert res["crashed"] == True
