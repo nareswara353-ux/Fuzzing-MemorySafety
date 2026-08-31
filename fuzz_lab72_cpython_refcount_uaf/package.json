@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab72_cpython_refcount_uaf",
+  "version": "1.0.0",
+  "description": "Lab 72 CPython Reference Counting and UAF Target",
+  "main": "target.py"
+}
