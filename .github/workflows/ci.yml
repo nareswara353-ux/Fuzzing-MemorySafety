@@ -97,6 +97,7 @@ jobs:
           if [ -d "fuzz_lab71_cpython_c_extension" ]; then cd fuzz_lab71_cpython_c_extension && python3 setup.py build_ext --inplace && cd .. || true; fi
           if [ -d "fuzz_lab72_cpython_refcount_uaf" ]; then cd fuzz_lab72_cpython_refcount_uaf && python3 setup.py build_ext --inplace && cd .. || true; fi
           if [ -d "fuzz_lab74_cpython_gil_deadlock" ]; then cd fuzz_lab74_cpython_gil_deadlock && python3 setup.py build_ext --inplace && cd .. || true; fi
+          if [ -f "fuzz_lab77_python_ctypes_ffi/native_mem.c" ]; then cd fuzz_lab77_python_ctypes_ffi && gcc -shared -fPIC native_mem.c -o libnative_mem.so && cd .. || true; fi
 
       - name: Execute Automated Regression Test Suite (pytest)
         run: |
