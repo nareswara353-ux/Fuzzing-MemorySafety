@@ -96,6 +96,7 @@ jobs:
           if [ -f "fuzz_lab68_typescript_decorator_di/target.ts" ]; then cd fuzz_lab68_typescript_decorator_di && npx -p typescript tsc target.ts && cd .. || true; fi
           if [ -d "fuzz_lab71_cpython_c_extension" ]; then cd fuzz_lab71_cpython_c_extension && python3 setup.py build_ext --inplace && cd .. || true; fi
           if [ -d "fuzz_lab72_cpython_refcount_uaf" ]; then cd fuzz_lab72_cpython_refcount_uaf && python3 setup.py build_ext --inplace && cd .. || true; fi
+          if [ -d "fuzz_lab74_cpython_gil_deadlock" ]; then cd fuzz_lab74_cpython_gil_deadlock && python3 setup.py build_ext --inplace && cd .. || true; fi
 
       - name: Execute Automated Regression Test Suite (pytest)
         run: |
