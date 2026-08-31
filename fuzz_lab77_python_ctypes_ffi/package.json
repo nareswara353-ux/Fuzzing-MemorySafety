@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab77_python_ctypes_ffi",
+  "version": "1.0.0",
+  "description": "Lab 77 Python ctypes and FFI Memory Safety Target",
+  "main": "target.py"
+}
