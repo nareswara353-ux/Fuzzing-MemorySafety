@@ -1961,3 +1961,28 @@ def test_cpython_pymalloc_arena_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_pymalloc_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_pypy_jit_guard_bailout_fuzzing():
+    import importlib.util
+    from fuzz_lab83_pypy_jit_guard_bailout.jit_runner import run_jit_target
+
+    mut_path = "fuzz_lab83_pypy_jit_guard_bailout/ai_mutator_jit.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 83 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_jit", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(8383)
+    sample = bytearray(b"\x00" * 16)
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"JIT\x00"
+    mut.deinit()
+
+    target_py = "fuzz_lab83_pypy_jit_guard_bailout/target.py"
+    crash_file = "fuzz_lab83_pypy_jit_guard_bailout/in/crash_guard_fail.bin"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_jit_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
