@@ -1,0 +1,6 @@
+{
+  "tasks": [
+    {"id": 1, "duration_ms": 10, "blocking": false},
+    {"id": 2, "duration_ms": 20, "blocking": false}
+  ]
+}
