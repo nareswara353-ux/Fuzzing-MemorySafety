@@ -1859,3 +1859,30 @@ def test_python_asyncio_starvation_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_asyncio_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_numpy_buffer_protocol_fuzzing():
+    import importlib.util
+    import struct
+    from fuzz_lab79_python_numpy_buffer_protocol.numpy_runner import run_numpy_target
+
+    mut_path = "fuzz_lab79_python_numpy_buffer_protocol/ai_mutator_numpy.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 79 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_numpy", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(7979)
+    sample = bytearray(b"\x00" * 44)
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"NMP\x00"
+    assert len(res) >= 44
+    mut.deinit()
+
+    target_py = "fuzz_lab79_python_numpy_buffer_protocol/target.py"
+    crash_file = "fuzz_lab79_python_numpy_buffer_protocol/in/crash_strides.bin"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_numpy_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
