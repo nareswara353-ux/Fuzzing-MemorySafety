@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab85_python_auto_patcher",
+  "version": "1.0.0",
+  "description": "Lab 85 Python AST Auto-Patcher and Program Repair Target",
+  "main": "vuln_target.py"
+}
