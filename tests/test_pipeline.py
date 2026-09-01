@@ -1832,3 +1832,30 @@ def test_python_ctypes_ffi_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_ctypes_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_asyncio_starvation_fuzzing():
+    import importlib.util
+    import json
+    from fuzz_lab78_python_asyncio_starvation.asyncio_runner import run_asyncio_target
+
+    mut_path = "fuzz_lab78_python_asyncio_starvation/ai_mutator_asyncio.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 78 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_asyncio", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(7878)
+    sample = bytearray(b"{}")
+    res = mut.fuzz(sample, None, 256)
+
+    parsed = json.loads(res.decode("utf-8"))
+    assert "tasks" in parsed
+    mut.deinit()
+
+    target_py = "fuzz_lab78_python_asyncio_starvation/target.py"
+    crash_file = "fuzz_lab78_python_asyncio_starvation/in/crash_starvation.json"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_asyncio_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
