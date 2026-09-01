@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab84_python_shared_memory_ipc",
+  "version": "1.0.0",
+  "description": "Lab 84 Python multiprocessing.shared_memory IPC Target",
+  "main": "target.py"
+}
