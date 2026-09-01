@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab80_cython_nogil_race",
+  "version": "1.0.0",
+  "description": "Lab 80 Cython nogil Memory Boundary and Race Target",
+  "main": "target.py"
+}
