@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab79_python_numpy_buffer_protocol",
+  "version": "1.0.0",
+  "description": "Lab 79 NumPy C-Buffer Protocol Strided Memory Target",
+  "main": "target.py"
+}
