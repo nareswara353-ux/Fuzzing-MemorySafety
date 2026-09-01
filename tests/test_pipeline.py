@@ -2011,3 +2011,41 @@ def test_python_shared_memory_ipc_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_shm_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_ast_auto_patcher_fuzzing():
+    import importlib.util
+    from fuzz_lab85_python_auto_patcher.patcher_runner import run_target
+    from fuzz_lab85_python_auto_patcher.patcher import auto_patch_source
+
+    mut_path = "fuzz_lab85_python_auto_patcher/ai_mutator_patcher.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 85 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_patcher", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(8585)
+    sample = bytearray(b"{'a': 1}")
+    res = mut.fuzz(sample, None, 64)
+
+    assert len(res) > 0
+    mut.deinit()
+
+    # Validasi transformasi AST
+    sample_code = "def f(x):\n    return eval(x)"
+    repaired_code = auto_patch_source(sample_code)
+    assert "literal_eval" in repaired_code
+
+    vuln_py = "fuzz_lab85_python_auto_patcher/vuln_target.py"
+    patched_py = "fuzz_lab85_python_auto_patcher/patched_target.py"
+    crash_file = "fuzz_lab85_python_auto_patcher/in/crash_eval.txt"
+
+    if os.path.exists(vuln_py) and os.path.exists(patched_py) and os.path.exists(crash_file):
+        # Target awal harus crash
+        res_vuln = run_target(vuln_py, crash_file)
+        assert res_vuln["crashed"] is True
+
+        # Target hasil repair AST harus aman
+        res_patched = run_target(patched_py, crash_file)
+        assert res_patched["crashed"] is False
