@@ -1911,3 +1911,28 @@ def test_cython_nogil_race_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_nogil_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_cpython_bytecode_frame_fuzzing():
+    import importlib.util
+    from fuzz_lab81_cpython_bytecode_frame.bytecode_runner import run_bytecode_target
+
+    mut_path = "fuzz_lab81_cpython_bytecode_frame/ai_mutator_bytecode.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 81 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_bytecode", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(8181)
+    sample = bytearray(b"\x00" * 16)
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"BCF\x00"
+    mut.deinit()
+
+    target_py = "fuzz_lab81_cpython_bytecode_frame/target.py"
+    crash_file = "fuzz_lab81_cpython_bytecode_frame/in/crash_bytecode.bin"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_bytecode_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
