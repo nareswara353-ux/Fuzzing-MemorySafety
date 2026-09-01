@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab78_python_asyncio_starvation",
+  "version": "1.0.0",
+  "description": "Lab 78 Python Asyncio Event Loop Starvation Target",
+  "main": "target.py"
+}
