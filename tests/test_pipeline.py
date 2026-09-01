@@ -1986,3 +1986,28 @@ def test_pypy_jit_guard_bailout_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_jit_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_shared_memory_ipc_fuzzing():
+    import importlib.util
+    from fuzz_lab84_python_shared_memory_ipc.shm_runner import run_shm_target
+
+    mut_path = "fuzz_lab84_python_shared_memory_ipc/ai_mutator_shm.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 84 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_shm", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(8484)
+    sample = bytearray(b"\x00" * 16)
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"SHM\x00"
+    mut.deinit()
+
+    target_py = "fuzz_lab84_python_shared_memory_ipc/target.py"
+    crash_file = "fuzz_lab84_python_shared_memory_ipc/in/crash_shm.bin"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_shm_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
