@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab83_pypy_jit_guard_bailout",
+  "version": "1.0.0",
+  "description": "Lab 83 PyPy RPython JIT Trace Guard and Bailout Target",
+  "main": "target.py"
+}
