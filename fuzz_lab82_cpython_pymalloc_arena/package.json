@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab82_cpython_pymalloc_arena",
+  "version": "1.0.0",
+  "description": "Lab 82 CPython pymalloc Arena Allocator and Pool Boundary Target",
+  "main": "target.py"
+}
