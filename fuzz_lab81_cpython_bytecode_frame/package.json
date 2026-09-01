@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab81_cpython_bytecode_frame",
+  "version": "1.0.0",
+  "description": "Lab 81 CPython Bytecode Frame Manipulation and Stack Underflow Target",
+  "main": "target.py"
+}
