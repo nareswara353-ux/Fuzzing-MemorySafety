@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab86_python_unicode_surrogate",
+  "version": "1.0.0",
+  "description": "Lab 86 Python Unicode Interning and Surrogate Decoder Target",
+  "main": "target.py"
+}
