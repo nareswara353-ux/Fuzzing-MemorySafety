@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab89_python_gc_cycle_detection",
+  "version": "1.0.0",
+  "description": "Lab 89 Python Generational GC Cycle and Finalizer Target",
+  "main": "target.py"
+}
