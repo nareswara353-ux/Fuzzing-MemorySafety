@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab87_python_memoryview_invalidation",
+  "version": "1.0.0",
+  "description": "Lab 87 Python memoryview Lifetime and Buffer Invalidation Target",
+  "main": "target.py"
+}
