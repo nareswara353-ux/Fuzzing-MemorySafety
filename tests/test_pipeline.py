@@ -2157,12 +2157,25 @@ def test_lab90_crash_poc():
     lab_dir = os.path.join(os.path.dirname(__file__), '..', 'fuzz_lab90_cpython_subinterpreters')
     poc = os.path.join(lab_dir, 'in', 'crash_poc.py')
     runner = os.path.join(lab_dir, 'lab90_runner.py')
-    # Pastikan ekstensi sudah dibangun
-    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-e', lab_dir],
+
+    # Build in-place (tanpa pip)
+    build_cmd = [sys.executable, 'setup.py', 'build_ext', '--inplace']
+    subprocess.check_call(build_cmd, cwd=lab_dir,
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    # Test buggy (harus crash)
-    result = subprocess.run([sys.executable, runner, poc], capture_output=True)
+
+    # Tambahkan lab_dir ke PYTHONPATH
+    env = os.environ.copy()
+    pythonpath = env.get('PYTHONPATH', '')
+    if pythonpath:
+        pythonpath = lab_dir + os.pathsep + pythonpath
+    else:
+        pythonpath = lab_dir
+    env['PYTHONPATH'] = pythonpath
+
+    # Buggy – harus crash
+    result = subprocess.run([sys.executable, runner, poc], env=env, capture_output=True)
     assert result.returncode != 0, "Expected crash but got success"
-    # Test safe (harus sukses)
-    result_safe = subprocess.run([sys.executable, runner, poc, '--safe'], capture_output=True)
+
+    # Safe – harus sukses
+    result_safe = subprocess.run([sys.executable, runner, poc, '--safe'], env=env, capture_output=True)
     assert result_safe.returncode == 0, "Safe mode should succeed"
