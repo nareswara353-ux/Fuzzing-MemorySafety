@@ -2049,3 +2049,28 @@ def test_python_ast_auto_patcher_fuzzing():
         # Target hasil repair AST harus aman
         res_patched = run_target(patched_py, crash_file)
         assert res_patched["crashed"] is False
+
+def test_python_unicode_surrogate_fuzzing():
+    import importlib.util
+    from fuzz_lab86_python_unicode_surrogate.unicode_runner import run_unicode_target
+
+    mut_path = "fuzz_lab86_python_unicode_surrogate/ai_mutator_unicode.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 86 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_unicode", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(8686)
+    sample = bytearray(b"\x00" * 16)
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"UNI\x00"
+    mut.deinit()
+
+    target_py = "fuzz_lab86_python_unicode_surrogate/target.py"
+    crash_file = "fuzz_lab86_python_unicode_surrogate/in/crash_surrogate.bin"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_unicode_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
