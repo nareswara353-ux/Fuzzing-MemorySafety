@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab88_python_exception_unwind",
+  "version": "1.0.0",
+  "description": "Lab 88 Python Exception Unwinding and Traceback Leak Target",
+  "main": "target.py"
+}
