@@ -2124,3 +2124,28 @@ def test_python_exception_unwind_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_exception_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_python_gc_cycle_detection_fuzzing():
+    import importlib.util
+    from fuzz_lab89_python_gc_cycle_detection.gc_runner import run_gc_target
+
+    mut_path = "fuzz_lab89_python_gc_cycle_detection/ai_mutator_gc.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 89 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_gc", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(8989)
+    sample = bytearray(b"\x00" * 16)
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"GCC\x00"
+    mut.deinit()
+
+    target_py = "fuzz_lab89_python_gc_cycle_detection/target.py"
+    crash_file = "fuzz_lab89_python_gc_cycle_detection/in/crash_gc.bin"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_gc_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
