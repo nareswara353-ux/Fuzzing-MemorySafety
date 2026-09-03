@@ -2149,3 +2149,20 @@ def test_python_gc_cycle_detection_fuzzing():
     if os.path.exists(target_py) and os.path.exists(crash_file):
         res_exec = run_gc_target(target_py, crash_file)
         assert res_exec["crashed"] is True
+
+def test_lab90_crash_poc():
+    import subprocess
+    import os
+    import sys
+    lab_dir = os.path.join(os.path.dirname(__file__), '..', 'fuzz_lab90_cpython_subinterpreters')
+    poc = os.path.join(lab_dir, 'in', 'crash_poc.py')
+    runner = os.path.join(lab_dir, 'lab90_runner.py')
+    # Pastikan ekstensi sudah dibangun
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-e', lab_dir],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # Test buggy (harus crash)
+    result = subprocess.run([sys.executable, runner, poc], capture_output=True)
+    assert result.returncode != 0, "Expected crash but got success"
+    # Test safe (harus sukses)
+    result_safe = subprocess.run([sys.executable, runner, poc, '--safe'], capture_output=True)
+    assert result_safe.returncode == 0, "Safe mode should succeed"

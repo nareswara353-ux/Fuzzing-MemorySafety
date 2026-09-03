@@ -1,0 +1,11 @@
+{
+  "name": "fuzz_lab90_cpython_subinterpreters",
+  "version": "1.0.0",
+  "description": "Fuzzing CPython subinterpreter state isolation",
+  "main": "lab90_runner.py",
+  "scripts": {
+    "test": "pytest tests/test_pipeline.py"
+  },
+  "author": "",
+  "license": "ISC"
+}
