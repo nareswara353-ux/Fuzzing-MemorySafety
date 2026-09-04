@@ -15,12 +15,13 @@ static PyObject* run_code_safe(PyObject* self, PyObject* args) {
     PyThreadState_Swap(sub_tstate);
     PyObject* result = PyRun_String(code, Py_file_input,
                                     PyEval_GetGlobals(), PyEval_GetLocals());
-    PyThreadState_Swap(main_tstate);
-    Py_EndInterpreter(sub_tstate);
     if (!result) {
-        return NULL;
+        PyErr_Clear();   // ignore error
+    } else {
+        Py_DECREF(result);
     }
-    Py_DECREF(result);
+    Py_EndInterpreter(sub_tstate);
+    PyThreadState_Swap(main_tstate);
     Py_RETURN_NONE;
 }
 
@@ -38,14 +39,16 @@ static PyObject* run_code_buggy(PyObject* self, PyObject* args) {
     PyThreadState_Swap(sub_tstate);
     PyObject* result = PyRun_String(code, Py_file_input,
                                     PyEval_GetGlobals(), PyEval_GetLocals());
-    PyThreadState_Swap(main_tstate);
-    // BUG: subinterpreter dihancurkan, tetapi result (yang berasal dari subinterpreter)
-    // tetap dikembalikan. Ini menyebabkan dangling object.
-    Py_EndInterpreter(sub_tstate);
     if (!result) {
+        PyErr_SetString(PyExc_RuntimeError, "Execution failed in subinterpreter");
+        Py_EndInterpreter(sub_tstate);
+        PyThreadState_Swap(main_tstate);
         return NULL;
     }
-    return result;  // berbahaya: objek milik interpreter yang sudah mati
+    // BUG: return object from destroyed subinterpreter
+    Py_EndInterpreter(sub_tstate);
+    PyThreadState_Swap(main_tstate);
+    return result;
 }
 
 static PyMethodDef SubinterpreterMethods[] = {
