@@ -2180,3 +2180,28 @@ def test_lab90_crash_poc():
 
     result_safe = subprocess.run([sys.executable, runner, poc, "--safe"], env=env, capture_output=True)
     assert result_safe.returncode == 0, "Safe mode should succeed"
+
+def test_wasm_jit_differential_fuzzing():
+    import importlib.util
+    from fuzz_lab92_wasm_jit_differential.wasm_runner import run_wasm_target
+
+    mut_path = "fuzz_lab92_wasm_jit_differential/ai_mutator_wasm.py"
+    if not os.path.exists(mut_path):
+        pytest.skip("Lab 92 mutator not found")
+
+    spec = importlib.util.spec_from_file_location("ai_mutator_wasm", mut_path)
+    mut = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mut)
+
+    mut.init(9292)
+    sample = bytearray(b"\x00" * 20)
+    res = mut.fuzz(sample, None, 64)
+
+    assert res[:4] == b"\x00asm"
+    mut.deinit()
+
+    target_py = "fuzz_lab92_wasm_jit_differential/target.py"
+    crash_file = "fuzz_lab92_wasm_jit_differential/in/crash_divergence.bin"
+    if os.path.exists(target_py) and os.path.exists(crash_file):
+        res_exec = run_wasm_target(target_py, crash_file)
+        assert res_exec["crashed"] is True
