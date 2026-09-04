@@ -1,0 +1,6 @@
+{
+  "name": "fuzz_lab92_wasm_jit_differential",
+  "version": "1.0.0",
+  "description": "Lab 92 WebAssembly JIT Tiering Differential Conformance Target",
+  "main": "target.py"
+}
