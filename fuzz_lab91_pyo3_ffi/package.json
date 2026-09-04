@@ -1,0 +1,9 @@
+{
+  "name": "fuzz_lab91_pyo3_ffi",
+  "version": "1.0.0",
+  "description": "Fuzzing Rust-Python FFI with PyO3",
+  "main": "lab91_runner.py",
+  "scripts": {
+    "test": "pytest tests/test_pipeline.py"
+  }
+}

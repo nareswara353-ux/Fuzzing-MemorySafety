@@ -2150,32 +2150,33 @@ def test_python_gc_cycle_detection_fuzzing():
         res_exec = run_gc_target(target_py, crash_file)
         assert res_exec["crashed"] is True
 
+
 def test_lab90_crash_poc():
     import subprocess
     import os
     import sys
-    lab_dir = os.path.join(os.path.dirname(__file__), '..', 'fuzz_lab90_cpython_subinterpreters')
-    poc = os.path.join(lab_dir, 'in', 'crash_poc.py')
-    runner = os.path.join(lab_dir, 'lab90_runner.py')
+    lab_dir = os.path.join(os.path.dirname(__file__), "..", "fuzz_lab90_cpython_subinterpreters")
+    poc = os.path.join(lab_dir, "in", "crash_poc.py")
+    runner = os.path.join(lab_dir, "lab90_runner.py")
+    so_file = os.path.join(lab_dir, "subinterpreter_target.so")
 
-    # Build in-place (tanpa pip)
-    build_cmd = [sys.executable, 'setup.py', 'build_ext', '--inplace']
-    subprocess.check_call(build_cmd, cwd=lab_dir,
-                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if not os.path.exists(so_file):
+        cflags = subprocess.check_output(["python3-config", "--cflags"], text=True).strip()
+        ldflags = subprocess.check_output(["python3-config", "--ldflags"], text=True).strip()
+        cmd = (f"gcc -O2 -fPIC -shared -o {so_file} subinterpreter_target.c "
+               f"{cflags} {ldflags} -DPy_BUILD_CORE")
+        subprocess.check_call(cmd, shell=True, cwd=lab_dir,
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    # Tambahkan lab_dir ke PYTHONPATH
     env = os.environ.copy()
-    pythonpath = env.get('PYTHONPATH', '')
+    pythonpath = env.get("PYTHONPATH", "")
     if pythonpath:
-        pythonpath = lab_dir + os.pathsep + pythonpath
+        env["PYTHONPATH"] = lab_dir + os.pathsep + pythonpath
     else:
-        pythonpath = lab_dir
-    env['PYTHONPATH'] = pythonpath
+        env["PYTHONPATH"] = lab_dir
 
-    # Buggy – harus crash
     result = subprocess.run([sys.executable, runner, poc], env=env, capture_output=True)
     assert result.returncode != 0, "Expected crash but got success"
 
-    # Safe – harus sukses
-    result_safe = subprocess.run([sys.executable, runner, poc, '--safe'], env=env, capture_output=True)
+    result_safe = subprocess.run([sys.executable, runner, poc, "--safe"], env=env, capture_output=True)
     assert result_safe.returncode == 0, "Safe mode should succeed"
